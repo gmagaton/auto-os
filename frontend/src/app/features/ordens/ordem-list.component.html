@@ -1,0 +1,206 @@
+<!-- Header compacto -->
+<div class="list-header">
+  <h1>Ordens de Servico</h1>
+  <button mat-mini-fab color="primary" (click)="criarNova()" class="fab-add">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>
+
+<!-- Busca e Filtro de Data em linha -->
+<div class="ordens-filters">
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-icon matPrefix>search</mat-icon>
+    <input matInput [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange($event)" placeholder="Buscar placa, cliente..." />
+    @if (searchTerm) {
+      <button matSuffix mat-icon-button (click)="searchTerm = ''; onSearchChange('')">
+        <mat-icon>close</mat-icon>
+      </button>
+    }
+  </mat-form-field>
+
+  <button mat-icon-button [matMenuTriggerFor]="dateMenu" class="filter-btn" [class.active]="filtros().inicio || filtros().fim">
+    <mat-icon>date_range</mat-icon>
+  </button>
+  <mat-menu #dateMenu="matMenu" class="date-filter-menu">
+    <div class="date-filter-content" (click)="$event.stopPropagation()">
+      <mat-form-field appearance="outline">
+        <mat-label>Data Inicio</mat-label>
+        <input matInput [matDatepicker]="pickerInicio" [value]="filtros().inicio" (dateChange)="onDateChange('inicio', $event)">
+        <mat-datepicker-toggle matIconSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+        <mat-datepicker #pickerInicio></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Data Fim</mat-label>
+        <input matInput [matDatepicker]="pickerFim" [value]="filtros().fim" (dateChange)="onDateChange('fim', $event)">
+        <mat-datepicker-toggle matIconSuffix [for]="pickerFim"></mat-datepicker-toggle>
+        <mat-datepicker #pickerFim></mat-datepicker>
+      </mat-form-field>
+      @if (filtros().inicio || filtros().fim) {
+        <button mat-button color="warn" (click)="limparDatas()">Limpar datas</button>
+      }
+    </div>
+  </mat-menu>
+</div>
+
+<!-- Chips de Status -->
+<div class="status-chips">
+  <mat-chip-listbox [value]="filtroStatus()" (change)="onStatusChange($event.value)">
+    <mat-chip-option value="">Todas</mat-chip-option>
+    <mat-chip-option value="AGUARDANDO">Aguardando</mat-chip-option>
+    <mat-chip-option value="APROVADO">Aprovado</mat-chip-option>
+    <mat-chip-option value="AGENDADO">Agendado</mat-chip-option>
+    <mat-chip-option value="EM_ANDAMENTO">Em Andamento</mat-chip-option>
+    <mat-chip-option value="FINALIZADO">Finalizado</mat-chip-option>
+  </mat-chip-listbox>
+</div>
+
+@if (loading()) {
+  <div class="loading">
+    <mat-spinner></mat-spinner>
+  </div>
+} @else {
+  <!-- Desktop: Table view -->
+  <div class="table-container hide-mobile">
+    <table mat-table [dataSource]="ordens()">
+      <ng-container matColumnDef="criadoEm">
+        <th mat-header-cell *matHeaderCellDef>Data</th>
+        <td mat-cell *matCellDef="let ordem">{{ ordem.criadoEm | date:'dd/MM/yyyy' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="placa">
+        <th mat-header-cell *matHeaderCellDef>Placa</th>
+        <td mat-cell *matCellDef="let ordem">{{ ordem.veiculo.placa }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="cliente">
+        <th mat-header-cell *matHeaderCellDef>Cliente</th>
+        <td mat-cell *matCellDef="let ordem">{{ ordem.veiculo.cliente.nome }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let ordem">
+          <span class="status-badge" [class]="'status-' + ordem.status.toLowerCase().replace('_', '-')">
+            {{ getStatusLabel(ordem.status) }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="valorTotal">
+        <th mat-header-cell *matHeaderCellDef>Valor Total</th>
+        <td mat-cell *matCellDef="let ordem">
+          {{ ordem.valorTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="acoes">
+        <th mat-header-cell *matHeaderCellDef>Acoes</th>
+        <td mat-cell *matCellDef="let ordem">
+          <button mat-icon-button color="primary" matTooltip="Ver detalhes" (click)="verDetalhes(ordem); $event.stopPropagation()">
+            <mat-icon>visibility</mat-icon>
+          </button>
+          @if (ordem.status === 'AGUARDANDO') {
+            <button mat-icon-button color="accent" matTooltip="Editar" (click)="editar(ordem); $event.stopPropagation()">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" matTooltip="Excluir" (click)="confirmDelete(ordem); $event.stopPropagation()">
+              <mat-icon>delete</mat-icon>
+            </button>
+          }
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="clickable-row" (click)="verDetalhes(row)"></tr>
+    </table>
+  </div>
+
+  <!-- Mobile: Cards view -->
+  <div class="ordem-mobile-list">
+    @for (ordem of ordens(); track ordem.id) {
+      <div class="ordem-mobile-card" (click)="verDetalhes(ordem)">
+        <div class="ordem-card-header">
+          <span class="ordem-placa">{{ ordem.veiculo.placa }}</span>
+          <span class="status-badge" [class]="'status-' + ordem.status.toLowerCase().replace('_', '-')">
+            {{ getStatusLabel(ordem.status) }}
+          </span>
+        </div>
+        <div class="ordem-card-body">
+          <div class="ordem-cliente">{{ ordem.veiculo.cliente.nome }}</div>
+          <div class="ordem-details">
+            <span class="ordem-data">
+              <mat-icon>calendar_today</mat-icon>
+              {{ ordem.criadoEm | date:'dd/MM/yyyy' }}
+            </span>
+            <span class="ordem-valor">{{ ordem.valorTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+          </div>
+        </div>
+        <div class="ordem-card-actions">
+          <button mat-icon-button (click)="verDetalhes(ordem); $event.stopPropagation()">
+            <mat-icon>visibility</mat-icon>
+          </button>
+          @if (ordem.status === 'AGUARDANDO') {
+            <button mat-icon-button (click)="editar(ordem); $event.stopPropagation()">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button class="delete-btn" (click)="confirmDelete(ordem); $event.stopPropagation()">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (ordens().length === 0) {
+    <div class="empty-message">
+      <mat-icon>inbox</mat-icon>
+      <h3>Nenhuma ordem encontrada</h3>
+      <p>Crie uma nova ordem de servico para comecar</p>
+    </div>
+  }
+
+  <!-- Desktop: Mat Paginator -->
+  <mat-paginator
+    [length]="totalItems()"
+    [pageSize]="filtros().limit || 20"
+    [pageSizeOptions]="[10, 20, 50]"
+    [pageIndex]="(filtros().page || 1) - 1"
+    (page)="onPageChange($event)"
+    showFirstLastButtons>
+  </mat-paginator>
+
+  <!-- Mobile: Custom Paginator -->
+  <div class="mobile-paginator">
+    <div class="paginator-info">
+      <span class="current-range">{{ getPageRangeStart() }}-{{ getPageRangeEnd() }}</span> de {{ totalItems() }}
+    </div>
+    <div class="paginator-controls">
+      <button mat-stroked-button class="paginator-btn" [disabled]="!hasPreviousPage()" (click)="goToFirstPage()">
+        <mat-icon>first_page</mat-icon>
+      </button>
+      <button mat-stroked-button class="paginator-btn" [disabled]="!hasPreviousPage()" (click)="goToPreviousPage()">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <div class="paginator-pages">
+        <input
+          type="number"
+          class="page-input"
+          [value]="getCurrentPage()"
+          min="1"
+          [max]="getTotalPages()"
+          (change)="onPageInputChange($event)"
+          (keydown.enter)="onPageInputChange($event)"
+        />
+        <span class="page-separator">/</span>
+        <span class="page-total">{{ getTotalPages() }}</span>
+      </div>
+      <button mat-stroked-button class="paginator-btn" [disabled]="!hasNextPage()" (click)="goToNextPage()">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+      <button mat-stroked-button class="paginator-btn" [disabled]="!hasNextPage()" (click)="goToLastPage()">
+        <mat-icon>last_page</mat-icon>
+      </button>
+    </div>
+  </div>
+}

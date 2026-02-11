@@ -1,0 +1,104 @@
+<div class="header">
+  <div class="header-left">
+    <button mat-icon-button routerLink="/veiculos">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>{{ isEdit ? 'Editar Veiculo' : 'Novo Veiculo' }}</h1>
+  </div>
+</div>
+
+@if (loadingData()) {
+  <div class="loading">
+    <mat-spinner></mat-spinner>
+  </div>
+} @else {
+  <mat-card class="form-card">
+    <mat-card-content>
+      <form [formGroup]="form" class="form-container" (ngSubmit)="save()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Placa</mat-label>
+          <input matInput formControlName="placa" [style.text-transform]="'uppercase'" />
+          @if (form.get('placa')?.hasError('required') && form.get('placa')?.touched) {
+            <mat-error>Placa e obrigatoria</mat-error>
+          }
+          @if (form.get('placa')?.hasError('pattern') && form.get('placa')?.touched) {
+            <mat-error>Placa invalida (ex: ABC1234 ou ABC1D23)</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Cor</mat-label>
+          <input matInput formControlName="cor" />
+          @if (form.get('cor')?.hasError('required') && form.get('cor')?.touched) {
+            <mat-error>Cor e obrigatoria</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Ano</mat-label>
+          <input matInput type="number" formControlName="ano" min="1900" [max]="currentYear + 1" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Fabricante</mat-label>
+          <mat-select formControlName="fabricanteId" (selectionChange)="onFabricanteChange($event.value)">
+            @for (fabricante of fabricantes(); track fabricante.id) {
+              <mat-option [value]="fabricante.id">{{ fabricante.nome }}</mat-option>
+            }
+          </mat-select>
+          @if (form.get('fabricanteId')?.hasError('required') && form.get('fabricanteId')?.touched) {
+            <mat-error>Fabricante e obrigatorio</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Modelo</mat-label>
+          <mat-select formControlName="modeloId">
+            @for (modelo of modelos(); track modelo.id) {
+              <mat-option [value]="modelo.id">{{ modelo.nome }}</mat-option>
+            }
+          </mat-select>
+          @if (form.get('modeloId')?.hasError('required') && form.get('modeloId')?.touched) {
+            <mat-error>Modelo e obrigatorio</mat-error>
+          }
+          @if (modelos().length === 0 && form.get('fabricanteId')?.value) {
+            <mat-hint>Nenhum modelo cadastrado para este fabricante</mat-hint>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Cliente</mat-label>
+          <input
+            matInput
+            formControlName="clienteInput"
+            [matAutocomplete]="autoCliente"
+            placeholder="Digite para buscar..."
+          />
+          <mat-autocomplete #autoCliente="matAutocomplete" [displayWith]="displayCliente" (optionSelected)="onClienteSelected($event)">
+            @for (cliente of filteredClientes$ | async; track cliente.id) {
+              <mat-option [value]="cliente">{{ cliente.nome }} - {{ cliente.telefone }}</mat-option>
+            }
+          </mat-autocomplete>
+          @if (form.get('clienteId')?.hasError('required') && form.get('clienteId')?.touched) {
+            <mat-error>Cliente e obrigatorio</mat-error>
+          }
+        </mat-form-field>
+
+        @if (error()) {
+          <p class="error">{{ error() }}</p>
+        }
+
+        <div class="form-actions">
+          <button mat-button type="button" routerLink="/veiculos" [disabled]="loading()">Cancelar</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="loading() || form.invalid">
+            @if (loading()) {
+              <mat-spinner diameter="20"></mat-spinner>
+            } @else {
+              Salvar
+            }
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+}

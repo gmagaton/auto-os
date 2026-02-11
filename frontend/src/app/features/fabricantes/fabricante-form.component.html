@@ -1,0 +1,15 @@
+<h2 mat-dialog-title>{{ data?.fabricante ? 'Editar' : 'Novo' }} Fabricante</h2>
+<mat-dialog-content>
+  <form>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nome</mat-label>
+      <input matInput [(ngModel)]="nome" name="nome" required />
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="!nome.trim()">
+    Salvar
+  </button>
+</mat-dialog-actions>

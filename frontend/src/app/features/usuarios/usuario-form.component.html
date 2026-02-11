@@ -1,0 +1,61 @@
+<h2 mat-dialog-title>{{ data.usuario ? 'Editar Usuario' : 'Novo Usuario' }}</h2>
+<mat-dialog-content>
+  <form [formGroup]="form" class="form-container">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nome</mat-label>
+      <input matInput formControlName="nome" />
+      @if (form.get('nome')?.hasError('required') && form.get('nome')?.touched) {
+        <mat-error>Nome e obrigatorio</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" formControlName="email" />
+      @if (form.get('email')?.hasError('required') && form.get('email')?.touched) {
+        <mat-error>Email e obrigatorio</mat-error>
+      }
+      @if (form.get('email')?.hasError('email') && form.get('email')?.touched) {
+        <mat-error>Email invalido</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Senha{{ data.usuario ? ' (deixe em branco para manter)' : '' }}</mat-label>
+      <input matInput type="password" formControlName="senha" />
+      @if (form.get('senha')?.hasError('required') && form.get('senha')?.touched) {
+        <mat-error>Senha e obrigatoria</mat-error>
+      }
+      @if (form.get('senha')?.hasError('minlength') && form.get('senha')?.touched) {
+        <mat-error>Senha deve ter no minimo 6 caracteres</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Papel</mat-label>
+      <mat-select formControlName="papel">
+        <mat-option value="ADMIN">Administrador</mat-option>
+        <mat-option value="ATENDENTE">Atendente</mat-option>
+      </mat-select>
+      @if (form.get('papel')?.hasError('required') && form.get('papel')?.touched) {
+        <mat-error>Papel e obrigatorio</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-checkbox formControlName="ativo">Ativo</mat-checkbox>
+
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close [disabled]="loading()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="save()" [disabled]="loading() || form.invalid">
+    @if (loading()) {
+      <mat-spinner diameter="20"></mat-spinner>
+    } @else {
+      Salvar
+    }
+  </button>
+</mat-dialog-actions>

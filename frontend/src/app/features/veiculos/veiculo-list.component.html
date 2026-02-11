@@ -1,0 +1,106 @@
+<!-- Header compacto -->
+<div class="list-header">
+  <h1>Veiculos</h1>
+  <button mat-mini-fab color="primary" (click)="addVeiculo()" class="fab-add">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>
+
+<!-- Busca compacta -->
+<div class="list-search">
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-icon matPrefix>search</mat-icon>
+    <input matInput [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange($event)" placeholder="Buscar veiculo..." />
+  </mat-form-field>
+</div>
+
+@if (loading()) {
+  <div class="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+} @else {
+  <!-- Desktop: Table view -->
+  <div class="table-container hide-mobile">
+    <table mat-table [dataSource]="veiculos()">
+      <ng-container matColumnDef="placa">
+        <th mat-header-cell *matHeaderCellDef>Placa</th>
+        <td mat-cell *matCellDef="let veiculo">{{ veiculo.placa }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="fabricanteModelo">
+        <th mat-header-cell *matHeaderCellDef>Fabricante / Modelo</th>
+        <td mat-cell *matCellDef="let veiculo">
+          {{ veiculo.modelo?.fabricante?.nome }} {{ veiculo.modelo?.nome }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="cor">
+        <th mat-header-cell *matHeaderCellDef>Cor</th>
+        <td mat-cell *matCellDef="let veiculo">{{ veiculo.cor }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="ano">
+        <th mat-header-cell *matHeaderCellDef>Ano</th>
+        <td mat-cell *matCellDef="let veiculo">{{ veiculo.ano || '-' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="cliente">
+        <th mat-header-cell *matHeaderCellDef>Cliente</th>
+        <td mat-cell *matCellDef="let veiculo">{{ veiculo.cliente?.nome || '-' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="acoes">
+        <th mat-header-cell *matHeaderCellDef>Acoes</th>
+        <td mat-cell *matCellDef="let veiculo">
+          <button mat-icon-button color="primary" matTooltip="Editar" (click)="editVeiculo(veiculo); $event.stopPropagation()">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" matTooltip="Excluir" (click)="confirmDelete(veiculo); $event.stopPropagation()">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+
+  <!-- Mobile: Lista compacta -->
+  <div class="compact-list">
+    @for (veiculo of veiculos(); track veiculo.id) {
+      <div class="compact-card">
+        <div class="compact-main" (click)="editVeiculo(veiculo)">
+          <div class="compact-info">
+            <span class="compact-title placa">{{ veiculo.placa }}</span>
+            <span class="compact-subtitle">{{ veiculo.modelo?.fabricante?.nome }} {{ veiculo.modelo?.nome }}</span>
+            @if (veiculo.cliente?.nome) {
+              <span class="compact-detail">{{ veiculo.cliente?.nome }}</span>
+            }
+          </div>
+          <div class="compact-meta">
+            @if (veiculo.cor) {
+              <span class="compact-tag">{{ veiculo.cor }}</span>
+            }
+          </div>
+        </div>
+        <div class="compact-actions">
+          <button mat-icon-button (click)="editVeiculo(veiculo); $event.stopPropagation()">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button class="delete-btn" (click)="confirmDelete(veiculo); $event.stopPropagation()">
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (veiculos().length === 0) {
+    <div class="empty-message">
+      <mat-icon>directions_car</mat-icon>
+      <h3>Nenhum veiculo encontrado</h3>
+      <p>Adicione um novo veiculo para comecar</p>
+    </div>
+  }
+}

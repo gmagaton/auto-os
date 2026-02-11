@@ -1,0 +1,89 @@
+@if (loading()) {
+  <div class="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+} @else if (cliente()) {
+  <!-- Header compacto -->
+  <div class="detail-header-compact">
+    <div class="header-left">
+      <button mat-icon-button routerLink="/clientes">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1>{{ cliente()!.nome }}</h1>
+    </div>
+    <button mat-icon-button color="primary" (click)="editCliente()">
+      <mat-icon>edit</mat-icon>
+    </button>
+  </div>
+
+  <!-- Card de dados -->
+  <div class="detail-card">
+    <div class="info-section">
+      <h3><mat-icon>person</mat-icon> Dados do Cliente</h3>
+      <div class="info-list">
+        <div class="info-row">
+          <span class="label">Nome</span>
+          <span class="value">{{ cliente()!.nome }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Telefone</span>
+          <span class="value">{{ formatTelefone(cliente()!.telefone) }}</span>
+        </div>
+        @if (cliente()!.email) {
+          <div class="info-row">
+            <span class="label">Email</span>
+            <span class="value">{{ cliente()!.email }}</span>
+          </div>
+        }
+        @if (cliente()!.documento) {
+          <div class="info-row">
+            <span class="label">Documento</span>
+            <span class="value">{{ cliente()!.documento }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Veículos do cliente -->
+    <div class="info-section">
+      <h3>
+        <mat-icon>directions_car</mat-icon> Veiculos
+        <button mat-icon-button color="primary" class="section-action" (click)="addVeiculo()">
+          <mat-icon>add</mat-icon>
+        </button>
+      </h3>
+      @if (cliente()!.veiculos && cliente()!.veiculos!.length > 0) {
+        <div class="info-list">
+          @for (veiculo of cliente()!.veiculos; track veiculo.id) {
+            <div class="info-row clickable-with-actions">
+              <div class="row-main" (click)="goToVeiculo(veiculo)">
+                <span class="label">
+                  <strong class="veiculo-placa-inline">{{ veiculo.placa }}</strong>
+                  <span class="veiculo-modelo-inline">{{ veiculo.modelo.fabricante.nome }} {{ veiculo.modelo.nome }}</span>
+                </span>
+                <span class="value">
+                  @if (veiculo.cor) {
+                    <span class="veiculo-cor-tag">{{ veiculo.cor }}</span>
+                  }
+                  <mat-icon class="chevron-icon">chevron_right</mat-icon>
+                </span>
+              </div>
+              <button mat-icon-button class="row-action delete-action" (click)="deleteVeiculo(veiculo, $event)">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-section">
+          <p>Nenhum veiculo cadastrado</p>
+        </div>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="empty-message">
+    <mat-icon>error_outline</mat-icon>
+    <h3>Cliente nao encontrado</h3>
+  </div>
+}

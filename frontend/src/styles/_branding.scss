@@ -1,0 +1,113 @@
+// ===========================================
+// BRANDING - AutoOS Logo Sprites
+// Sprite: assets/branding/branding.png
+// ===========================================
+
+@use 'variables' as *;
+
+// Sprite base - imagem completa
+$branding-sprite: '/assets/branding/branding.png';
+
+// ===========================================
+// LOGO CLASSES
+// ===========================================
+
+// Favicon/Icon pequeno (canto superior esquerdo)
+.logo-icon-sm {
+  width: 48px;
+  height: 48px;
+  background: url($branding-sprite) no-repeat;
+  background-position: 0 0;
+  background-size: 800px auto;
+  display: inline-block;
+}
+
+// Logo horizontal com texto (centro superior)
+.logo-horizontal {
+  width: 180px;
+  height: 48px;
+  background: url($branding-sprite) no-repeat;
+  background-position: -60px 0;
+  background-size: 800px auto;
+  display: inline-block;
+}
+
+// Ícone médio/escudo (centro superior direito)
+.logo-icon-md {
+  width: 64px;
+  height: 64px;
+  background: url($branding-sprite) no-repeat;
+  background-position: -260px 0;
+  background-size: 800px auto;
+  display: inline-block;
+}
+
+// Logo em banner azul pequeno (canto superior direito)
+.logo-banner-sm {
+  width: 160px;
+  height: 48px;
+  background: url($branding-sprite) no-repeat;
+  background-position: -340px 0;
+  background-size: 800px auto;
+  display: inline-block;
+  border-radius: $border-radius-sm;
+}
+
+// Banner completo (parte inferior)
+.logo-banner-full {
+  width: 100%;
+  max-width: 500px;
+  height: 80px;
+  background: url($branding-sprite) no-repeat;
+  background-position: 0 -80px;
+  background-size: 800px auto;
+  display: block;
+}
+
+// ===========================================
+// COMPOSIÇÕES DE LOGO
+// ===========================================
+
+// Container para logo na sidenav
+.sidenav-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-md;
+  border-bottom: 1px solid $border-light;
+  background: linear-gradient(135deg, $primary-dark 0%, $primary-color 100%);
+
+  .logo-horizontal {
+    filter: brightness(0) invert(1); // Torna branco
+    opacity: 0.95;
+  }
+}
+
+// Container para logo no login
+.login-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-xl;
+
+  .logo-icon-md {
+    width: 80px;
+    height: 80px;
+    background-size: 1000px auto;
+    background-position: -325px 0;
+  }
+}
+
+// Header do app com logo
+.app-header-logo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  .logo-icon-sm {
+    width: 32px;
+    height: 32px;
+    background-size: 533px auto;
+  }
+}

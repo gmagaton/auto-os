@@ -1,0 +1,527 @@
+// ===========================================
+// LAYOUT STYLES - AutoOS
+// ===========================================
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// ===========================================
+// APP LAYOUT (Sidenav Container)
+// ===========================================
+
+.container,
+.sidenav-container {
+  height: 100vh;
+  background-color: $background-default;
+}
+
+// Main content area
+.content,
+.main-content {
+  padding: $spacing-lg $spacing-xl;
+  min-height: calc(100vh - 64px);
+  background-color: $background-default;
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+// Header spacer
+.spacer {
+  flex: 1 1 auto;
+}
+
+// ===========================================
+// SIDENAV
+// ===========================================
+
+mat-sidenav {
+  width: $sidenav-width !important;
+  background: $background-paper !important;
+  border-right: 1px solid $border-color !important;
+
+  @include mobile {
+    width: 280px !important;
+  }
+}
+
+mat-sidenav-content {
+  background-color: $background-default;
+}
+
+// Sidenav Header
+.sidenav-header {
+  padding: $spacing-md;
+  border-bottom: 1px solid $border-color;
+  background: linear-gradient(135deg, $primary-dark 0%, $primary-color 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+}
+
+.sidenav-logo-img {
+  max-width: 180px;
+  height: auto;
+}
+
+// Nav List
+mat-nav-list {
+  padding-top: $spacing-sm !important;
+
+  .mat-mdc-list-item {
+    margin: $spacing-xs $spacing-sm;
+    border-radius: $border-radius-md !important;
+    height: 48px !important;
+
+    &:hover {
+      background-color: $background-hover !important;
+    }
+
+    &.active {
+      background-color: rgba($primary-color, 0.1) !important;
+
+      .mat-icon {
+        color: $primary-color !important;
+      }
+
+      .mdc-list-item__primary-text {
+        color: $primary-color !important;
+        font-weight: $font-weight-medium;
+      }
+    }
+
+    .mat-icon {
+      color: $text-secondary;
+      margin-right: $spacing-md;
+    }
+  }
+}
+
+// ===========================================
+// TOOLBAR / HEADER
+// ===========================================
+
+mat-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: $z-index-sticky;
+  box-shadow: $shadow-sm;
+  min-height: $toolbar-height !important;
+
+  @include mobile {
+    min-height: $toolbar-height-mobile !important;
+  }
+
+  // Menu button
+  button[mat-icon-button] {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: $border-radius-md;
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  // Title
+  > span:not(.spacer) {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-medium;
+    margin-left: $spacing-sm;
+
+    @include mobile {
+      font-size: $font-size-md;
+    }
+  }
+
+  // User button
+  button[mat-button] {
+    height: 44px;
+    padding: 0 $spacing-md;
+    border-radius: $border-radius-md;
+
+    mat-icon {
+      margin-right: $spacing-xs;
+    }
+
+    @include mobile {
+      padding: 0 $spacing-sm;
+
+      .ml-2 {
+        display: none;
+      }
+    }
+  }
+}
+
+// ===========================================
+// PAGE STRUCTURE
+// ===========================================
+
+.page-container {
+  max-width: $content-max-width;
+  margin: 0 auto;
+  @include fade-in;
+}
+
+.page-container-narrow {
+  max-width: $content-narrow-width;
+  margin: 0 auto;
+  @include fade-in;
+}
+
+// ===========================================
+// PAGE HEADER
+// ===========================================
+
+.header,
+.page-header {
+  @include flex-between;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid $border-light;
+
+  h1 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    font-size: $font-size-xxl;
+
+    @include mobile {
+      font-size: $font-size-xl;
+    }
+  }
+
+  // Buttons inside header
+  button[mat-raised-button],
+  button[mat-flat-button] {
+    height: 44px;
+    padding: 0 $spacing-lg;
+    font-size: $font-size-base;
+
+    mat-icon {
+      margin-right: $spacing-xs;
+    }
+
+    @include mobile {
+      height: 48px;
+      width: 100%;
+      padding: 0 $spacing-md;
+    }
+  }
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+
+    h1 {
+      text-align: center;
+      justify-content: center;
+    }
+  }
+}
+
+.header-left {
+  @include flex-start;
+  gap: $spacing-sm;
+}
+
+.header-actions {
+  @include flex-end;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+
+  @include mobile {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+// ===========================================
+// SECTION
+// ===========================================
+
+.section {
+  @include section-container;
+}
+
+.section-header {
+  @include flex-between;
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-sm;
+  border-bottom: 1px solid $border-light;
+
+  h2, h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+}
+
+.section-content {
+  padding: $spacing-sm 0;
+}
+
+// ===========================================
+// TOOLBAR UTILITIES
+// ===========================================
+
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.toolbar-title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+}
+
+.toolbar-subtitle {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  margin-left: $spacing-sm;
+}
+
+// ===========================================
+// GRIDS
+// ===========================================
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $spacing-lg;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
+  }
+}
+
+.info-item {
+  @include flex-column;
+  gap: $spacing-xs;
+}
+
+.form-grid {
+  display: grid;
+  gap: $spacing-md;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $spacing-md;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ===========================================
+// CARDS GRID
+// ===========================================
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: $spacing-lg;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ===========================================
+// CONTENT GRID (Order Detail)
+// ===========================================
+
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: $spacing-lg;
+  margin-bottom: $spacing-lg;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
+  }
+}
+
+// Cards that follow content-grid need margin-top
+.items-card,
+.photos-card,
+.checklist-card,
+.historico-card {
+  margin-bottom: $spacing-lg;
+}
+
+// ===========================================
+// PHOTOS GRID
+// ===========================================
+
+.photos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: $spacing-md;
+
+  @include mobile {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: $spacing-sm;
+  }
+}
+
+// ===========================================
+// TABLE CONTAINER
+// ===========================================
+
+.table-container {
+  @include card;
+  overflow: hidden;
+
+  .mat-mdc-table {
+    width: 100%;
+  }
+}
+
+.table-responsive {
+  @include table-responsive;
+  @include custom-scrollbar;
+}
+
+// ===========================================
+// DETAIL PAGE
+// ===========================================
+
+.detail-header {
+  @include flex-between;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.detail-title {
+  @include flex-start;
+  gap: $spacing-md;
+
+  h1 {
+    margin: 0;
+  }
+}
+
+.detail-actions {
+  @include flex-end;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+
+  @include mobile {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+.detail-content {
+  display: grid;
+  gap: $spacing-lg;
+}
+
+// ===========================================
+// BACK BUTTON
+// ===========================================
+
+.back-link {
+  @include flex-start;
+  gap: $spacing-xs;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  margin-bottom: $spacing-md;
+  text-decoration: none;
+
+  &:hover {
+    color: $primary-color;
+    text-decoration: none;
+  }
+}
+
+// ===========================================
+// SPACING UTILITIES
+// ===========================================
+
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: $spacing-xs; }
+.mt-2 { margin-top: $spacing-sm; }
+.mt-3 { margin-top: $spacing-md; }
+.mt-4 { margin-top: $spacing-lg; }
+.mt-5 { margin-top: $spacing-xl; }
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: $spacing-xs; }
+.mb-2 { margin-bottom: $spacing-sm; }
+.mb-3 { margin-bottom: $spacing-md; }
+.mb-4 { margin-bottom: $spacing-lg; }
+.mb-5 { margin-bottom: $spacing-xl; }
+
+.ml-2 { margin-left: $spacing-sm; }
+.mr-2 { margin-right: $spacing-sm; }
+
+.gap-1 { gap: $spacing-xs; }
+.gap-2 { gap: $spacing-sm; }
+.gap-3 { gap: $spacing-md; }
+.gap-4 { gap: $spacing-lg; }
+
+// ===========================================
+// FLEX UTILITIES
+// ===========================================
+
+.flex { display: flex; }
+.flex-column { @include flex-column; }
+.flex-center { @include flex-center; }
+.flex-between { @include flex-between; }
+.flex-start { @include flex-start; }
+.flex-end { @include flex-end; }
+.flex-wrap { @include flex-wrap; }
+.flex-1 { flex: 1; }
+
+.align-center { align-items: center; }
+.align-start { align-items: flex-start; }
+.align-end { align-items: flex-end; }
+
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-start { justify-content: flex-start; }
+.justify-end { justify-content: flex-end; }
+
+// ===========================================
+// VISIBILITY
+// ===========================================
+
+.hide-mobile {
+  @include mobile {
+    display: none !important;
+  }
+}
+
+.show-mobile {
+  display: none !important;
+
+  @include mobile {
+    display: block !important;
+  }
+}
+
+.hide-tablet {
+  @include mobile-tablet {
+    display: none !important;
+  }
+}

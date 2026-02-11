@@ -1,0 +1,144 @@
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+import { PrismaService } from '../../prisma/prisma.service';
+import { CreateClienteDto } from './dto/create-cliente.dto';
+import { UpdateClienteDto } from './dto/update-cliente.dto';
+
+@Injectable()
+export class ClientesService {
+  constructor(private prisma: PrismaService) {}
+
+  async findAll(busca?: string) {
+    return this.prisma.cliente.findMany({
+      where: busca
+        ? {
+            OR: [
+              { nome: { contains: busca, mode: 'insensitive' } },
+              { telefone: { contains: busca, mode: 'insensitive' } },
+              { email: { contains: busca, mode: 'insensitive' } },
+            ],
+          }
+        : undefined,
+      select: {
+        id: true,
+        nome: true,
+        telefone: true,
+        email: true,
+        documento: true,
+        criadoEm: true,
+        _count: {
+          select: {
+            veiculos: true,
+          },
+        },
+      },
+      orderBy: { nome: 'asc' },
+    });
+  }
+
+  async findOne(id: string) {
+    const cliente = await this.prisma.cliente.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        nome: true,
+        telefone: true,
+        email: true,
+        documento: true,
+        criadoEm: true,
+        veiculos: {
+          select: {
+            id: true,
+            placa: true,
+            cor: true,
+            ano: true,
+            modelo: {
+              select: {
+                id: true,
+                nome: true,
+                fabricante: {
+                  select: {
+                    id: true,
+                    nome: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!cliente) {
+      throw new NotFoundException('Cliente não encontrado');
+    }
+
+    return cliente;
+  }
+
+  async create(dto: CreateClienteDto) {
+    return this.prisma.cliente.create({
+      data: {
+        nome: dto.nome,
+        telefone: dto.telefone,
+        email: dto.email,
+        documento: dto.documento,
+      },
+      select: {
+        id: true,
+        nome: true,
+        telefone: true,
+        email: true,
+        documento: true,
+        criadoEm: true,
+      },
+    });
+  }
+
+  async update(id: string, dto: UpdateClienteDto) {
+    await this.findOne(id);
+
+    return this.prisma.cliente.update({
+      where: { id },
+      data: dto,
+      select: {
+        id: true,
+        nome: true,
+        telefone: true,
+        email: true,
+        documento: true,
+        criadoEm: true,
+      },
+    });
+  }
+
+  async remove(id: string) {
+    const cliente = await this.prisma.cliente.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: {
+            veiculos: true,
+          },
+        },
+      },
+    });
+
+    if (!cliente) {
+      throw new NotFoundException('Cliente não encontrado');
+    }
+
+    if (cliente._count.veiculos > 0) {
+      throw new BadRequestException(
+        'Não é possível excluir cliente com veículos vinculados',
+      );
+    }
+
+    return this.prisma.cliente.delete({
+      where: { id },
+    });
+  }
+}

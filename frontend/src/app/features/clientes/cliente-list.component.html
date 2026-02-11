@@ -1,0 +1,95 @@
+<!-- Header compacto -->
+<div class="list-header">
+  <h1>Clientes</h1>
+  <button mat-mini-fab color="primary" (click)="openForm()" class="fab-add">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>
+
+<!-- Busca compacta -->
+<div class="list-search">
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-icon matPrefix>search</mat-icon>
+    <input matInput [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange($event)" placeholder="Buscar cliente..." />
+  </mat-form-field>
+</div>
+
+@if (loading()) {
+  <div class="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+} @else {
+  <!-- Desktop: Table view -->
+  <div class="table-container hide-mobile">
+    <table mat-table [dataSource]="clientes()">
+      <ng-container matColumnDef="nome">
+        <th mat-header-cell *matHeaderCellDef>Nome</th>
+        <td mat-cell *matCellDef="let cliente">{{ cliente.nome }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="telefone">
+        <th mat-header-cell *matHeaderCellDef>Telefone</th>
+        <td mat-cell *matCellDef="let cliente">{{ formatTelefone(cliente.telefone) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let cliente">{{ cliente.email || '-' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="veiculos">
+        <th mat-header-cell *matHeaderCellDef>Veiculos</th>
+        <td mat-cell *matCellDef="let cliente">{{ cliente._count?.veiculos || 0 }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="acoes">
+        <th mat-header-cell *matHeaderCellDef>Acoes</th>
+        <td mat-cell *matCellDef="let cliente">
+          <button mat-icon-button color="primary" matTooltip="Editar" (click)="openForm(cliente); $event.stopPropagation()">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" matTooltip="Excluir" (click)="confirmDelete(cliente); $event.stopPropagation()">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="clickable-row" (click)="goToDetail(row)"></tr>
+    </table>
+  </div>
+
+  <!-- Mobile: Lista compacta -->
+  <div class="compact-list">
+    @for (cliente of clientes(); track cliente.id) {
+      <div class="compact-card" (click)="goToDetail(cliente)">
+        <div class="compact-main">
+          <div class="compact-info">
+            <span class="compact-title">{{ cliente.nome }}</span>
+            <span class="compact-subtitle">{{ formatTelefone(cliente.telefone) }}</span>
+          </div>
+          <div class="compact-meta">
+            <span class="compact-badge">{{ cliente._count?.veiculos || 0 }}</span>
+            <mat-icon class="compact-chevron">chevron_right</mat-icon>
+          </div>
+        </div>
+        <div class="compact-actions">
+          <button mat-icon-button (click)="openForm(cliente); $event.stopPropagation()">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button class="delete-btn" (click)="confirmDelete(cliente); $event.stopPropagation()">
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (clientes().length === 0) {
+    <div class="empty-message">
+      <mat-icon>people</mat-icon>
+      <h3>Nenhum cliente encontrado</h3>
+      <p>Adicione um novo cliente para comecar</p>
+    </div>
+  }
+}

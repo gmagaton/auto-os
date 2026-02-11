@@ -1,0 +1,308 @@
+@if (loading()) {
+  <div class="loading">
+    <mat-spinner></mat-spinner>
+  </div>
+} @else if (ordem()) {
+  <!-- Header compacto -->
+  <div class="detail-header-compact ordem-header">
+    <div class="header-left">
+      <button mat-icon-button routerLink="/ordens">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1>OS #{{ ordem()!.token.slice(-6).toUpperCase() }}</h1>
+    </div>
+    <div class="header-actions">
+      @if (podeEditar()) {
+        <button mat-icon-button color="primary" [routerLink]="['/ordens', ordem()!.id, 'editar']" matTooltip="Editar">
+          <mat-icon>edit</mat-icon>
+        </button>
+      }
+      <button mat-icon-button [matMenuTriggerFor]="actionsMenu" matTooltip="Acoes">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #actionsMenu="matMenu">
+        <button mat-menu-item (click)="downloadPdf()" [disabled]="downloadingPdf()">
+          <mat-icon>picture_as_pdf</mat-icon>
+          <span>Gerar PDF</span>
+        </button>
+        @if (ordem()!.status === 'AGUARDANDO') {
+          <button mat-menu-item (click)="copiarLinkCliente()">
+            <mat-icon>link</mat-icon>
+            <span>Copiar Link do Cliente</span>
+          </button>
+        }
+        @switch (ordem()!.status) {
+          @case ('APROVADO') {
+            <button mat-menu-item (click)="abrirDialogAgendar()">
+              <mat-icon>event</mat-icon>
+              <span>Agendar</span>
+            </button>
+          }
+          @case ('AGENDADO') {
+            <button mat-menu-item (click)="iniciarServico()">
+              <mat-icon>play_arrow</mat-icon>
+              <span>Iniciar Servico</span>
+            </button>
+          }
+          @case ('EM_ANDAMENTO') {
+            <button mat-menu-item (click)="mudarStatus('FINALIZADO')">
+              <mat-icon>check_circle</mat-icon>
+              <span>Finalizar</span>
+            </button>
+          }
+        }
+        @if (podeAdicionarFoto()) {
+          <button mat-menu-item (click)="abrirDialogUpload()">
+            <mat-icon>add_photo_alternate</mat-icon>
+            <span>Adicionar Foto</span>
+          </button>
+        }
+      </mat-menu>
+    </div>
+  </div>
+
+  <!-- Status e Resumo -->
+  <div class="detail-card">
+    <div class="ordem-resumo">
+      <div class="resumo-status">
+        <span class="status-badge" [class]="'status-' + ordem()!.status.toLowerCase().replace('_', '-')">
+          {{ getStatusLabel(ordem()!.status) }}
+        </span>
+      </div>
+      <div class="resumo-info">
+        <span class="resumo-placa">{{ ordem()!.veiculo.placa }}</span>
+        <span class="resumo-detalhe">{{ ordem()!.veiculo.modelo.fabricante.nome }} {{ ordem()!.veiculo.modelo.nome }}</span>
+        <span class="resumo-detalhe">{{ ordem()!.veiculo.cliente.nome }}</span>
+      </div>
+      <div class="resumo-total">
+        <span class="total-label">Total</span>
+        <span class="total-valor">{{ ordem()!.valorTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <mat-tab-group class="detail-tabs" animationDuration="200ms">
+    <!-- Tab Dados -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>info</mat-icon>
+        <span class="tab-label-text">Dados</span>
+      </ng-template>
+      <div class="detail-card">
+        <div class="info-section">
+          <h3><mat-icon>directions_car</mat-icon> Veiculo</h3>
+          <div class="info-list">
+            <div class="info-row">
+              <span class="label">Placa</span>
+              <span class="value">{{ ordem()!.veiculo.placa }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Modelo</span>
+              <span class="value">{{ ordem()!.veiculo.modelo.fabricante.nome }} {{ ordem()!.veiculo.modelo.nome }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Cor</span>
+              <span class="value">{{ ordem()!.veiculo.cor }}</span>
+            </div>
+            @if (ordem()!.veiculo.ano) {
+              <div class="info-row">
+                <span class="label">Ano</span>
+                <span class="value">{{ ordem()!.veiculo.ano }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="info-section">
+          <h3><mat-icon>person</mat-icon> Cliente</h3>
+          <div class="info-list">
+            <div class="info-row">
+              <span class="label">Nome</span>
+              <span class="value">{{ ordem()!.veiculo.cliente.nome }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Telefone</span>
+              <span class="value">{{ formatTelefone(ordem()!.veiculo.cliente.telefone) }}</span>
+            </div>
+            @if (ordem()!.veiculo.cliente.email) {
+              <div class="info-row">
+                <span class="label">Email</span>
+                <span class="value">{{ ordem()!.veiculo.cliente.email }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="info-section">
+          <h3><mat-icon>assignment</mat-icon> Ordem</h3>
+          <div class="info-list">
+            <div class="info-row">
+              <span class="label">Criado em</span>
+              <span class="value">{{ ordem()!.criadoEm | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Atendente</span>
+              <span class="value">{{ ordem()!.usuario.nome }}</span>
+            </div>
+            @if (ordem()!.aprovadoEm) {
+              <div class="info-row">
+                <span class="label">Aprovado em</span>
+                <span class="value">{{ ordem()!.aprovadoEm | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+            }
+            @if (ordem()!.dataAgendada) {
+              <div class="info-row">
+                <span class="label">Agendado</span>
+                <span class="value">{{ ordem()!.dataAgendada | date:'dd/MM/yyyy' }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (historico().length > 0) {
+          <div class="info-section">
+            <h3><mat-icon>history</mat-icon> Historico</h3>
+            <div class="info-list">
+              @for (item of historico(); track item.id) {
+                <div class="info-row">
+                  <span class="label">
+                    <span class="status-dot" [class]="'dot-' + item.statusPara.toLowerCase().replace('_', '-')"></span>
+                    {{ getHistoricoStatusLabel(item.statusPara) }}
+                  </span>
+                  <span class="value">{{ item.criadoEm | date:'dd/MM HH:mm' }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </mat-tab>
+
+    <!-- Tab Itens -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>receipt</mat-icon>
+        <span class="tab-label-text">Itens</span>
+      </ng-template>
+      <div class="detail-card">
+        <div class="info-section">
+          <h3><mat-icon>build</mat-icon> Servicos e Adicionais</h3>
+          <div class="info-list">
+            @for (item of ordem()!.itens; track item.id) {
+              <div class="info-row item-row">
+                <div class="item-info">
+                  <span class="item-nome">{{ item.servico.nome }}</span>
+                  <span class="tipo-badge" [class]="item.servico.tipo === 'SERVICO' ? 'tipo-servico' : 'tipo-adicional'">
+                    {{ item.servico.tipo === 'SERVICO' ? 'Servico' : 'Adicional' }}
+                  </span>
+                </div>
+                <span class="value valor-destaque">{{ item.valor | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="total-card">
+          <span>Total</span>
+          <strong>{{ ordem()!.valorTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Tab Fotos -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>photo_library</mat-icon>
+        <span class="tab-label-text">Fotos</span>
+        @if (ordem()!.fotos.length > 0) {
+          <span class="tab-badge">{{ ordem()!.fotos.length }}</span>
+        }
+      </ng-template>
+      <div class="detail-card">
+        @if (podeAdicionarFoto()) {
+          <button mat-stroked-button class="btn-full" (click)="abrirDialogUpload()">
+            <mat-icon>add_photo_alternate</mat-icon>
+            Adicionar Foto
+          </button>
+        }
+
+        @if (ordem()!.fotos.length === 0) {
+          <div class="empty-section">
+            <mat-icon>photo_library</mat-icon>
+            <p>Nenhuma foto adicionada</p>
+          </div>
+        } @else {
+          <mat-tab-group class="photos-inner-tabs">
+            <mat-tab label="Entrada ({{ getFotosByTipo('ENTRADA').length }})">
+              <div class="photos-grid">
+                @for (foto of getFotosByTipo('ENTRADA'); track foto.id) {
+                  <div class="photo-item">
+                    <img [src]="getPhotoUrl(foto.url)" [alt]="'Foto'" (click)="abrirFoto(getPhotoUrl(foto.url))" />
+                    @if (podeAdicionarFoto()) {
+                      <button mat-icon-button class="photo-delete" (click)="removerFoto(foto)">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    }
+                  </div>
+                }
+                @if (getFotosByTipo('ENTRADA').length === 0) {
+                  <p class="no-items-text">Nenhuma foto</p>
+                }
+              </div>
+            </mat-tab>
+            <mat-tab label="Progresso ({{ getFotosByTipo('PROGRESSO').length }})">
+              <div class="photos-grid">
+                @for (foto of getFotosByTipo('PROGRESSO'); track foto.id) {
+                  <div class="photo-item">
+                    <img [src]="getPhotoUrl(foto.url)" [alt]="'Foto'" (click)="abrirFoto(getPhotoUrl(foto.url))" />
+                    @if (podeAdicionarFoto()) {
+                      <button mat-icon-button class="photo-delete" (click)="removerFoto(foto)">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    }
+                  </div>
+                }
+                @if (getFotosByTipo('PROGRESSO').length === 0) {
+                  <p class="no-items-text">Nenhuma foto</p>
+                }
+              </div>
+            </mat-tab>
+            <mat-tab label="Final ({{ getFotosByTipo('FINAL').length }})">
+              <div class="photos-grid">
+                @for (foto of getFotosByTipo('FINAL'); track foto.id) {
+                  <div class="photo-item">
+                    <img [src]="getPhotoUrl(foto.url)" [alt]="'Foto'" (click)="abrirFoto(getPhotoUrl(foto.url))" />
+                    @if (podeAdicionarFoto()) {
+                      <button mat-icon-button class="photo-delete" (click)="removerFoto(foto)">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    }
+                  </div>
+                }
+                @if (getFotosByTipo('FINAL').length === 0) {
+                  <p class="no-items-text">Nenhuma foto</p>
+                }
+              </div>
+            </mat-tab>
+          </mat-tab-group>
+        }
+      </div>
+    </mat-tab>
+
+    <!-- Tab Checklist -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>checklist</mat-icon>
+        <span class="tab-label-text">Check</span>
+      </ng-template>
+      <div class="detail-card">
+        <app-checklist-preencher
+          [ordemId]="ordem()!.id"
+          [disabled]="!podeEditarChecklist()"
+        />
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+} @else {
+  <p class="empty">Ordem nao encontrada.</p>
+}

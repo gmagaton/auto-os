@@ -1,0 +1,257 @@
+<!-- Header fixo -->
+<div class="stepper-header">
+  <button mat-icon-button routerLink="/ordens" class="back-btn">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <div class="header-title">
+    @if (isEdit && ordemNumero()) {
+      <h1>OS #{{ ordemNumero() }}</h1>
+      <span class="header-subtitle">Editando</span>
+    } @else {
+      <h1>Nova OS</h1>
+    }
+  </div>
+  <div class="step-indicator">
+    <span class="step-current">{{ currentStep() + 1 }}</span>
+    <span class="step-total">de 3</span>
+  </div>
+</div>
+
+@if (loadingData()) {
+  <div class="loading">
+    <mat-spinner></mat-spinner>
+  </div>
+} @else {
+  <div class="stepper-container">
+    <!-- Step 1: Placa -->
+    @if (currentStep() === 0) {
+      <div class="step-content step-placa">
+        <div class="step-title">
+          <div class="step-icon">
+            <mat-icon>directions_car</mat-icon>
+          </div>
+          <div class="step-text">
+            <h2>Informe a Placa</h2>
+            <p>Digite a placa do veiculo</p>
+          </div>
+        </div>
+
+        @if (!veiculoSelecionado()) {
+          <div class="placa-input-container">
+            <mat-form-field appearance="outline" class="placa-field">
+              <mat-label>Placa do Veiculo</mat-label>
+              <input
+                matInput
+                [formControl]="veiculoInputControl"
+                [matAutocomplete]="autoVeiculo"
+                placeholder="ABC-1234"
+                class="placa-input"
+                autocomplete="off"
+              />
+              <mat-icon matSuffix>search</mat-icon>
+              <mat-autocomplete #autoVeiculo="matAutocomplete" [displayWith]="displayVeiculo" (optionSelected)="onVeiculoSelected($event)">
+                @for (veiculo of filteredVeiculos$ | async; track veiculo.id) {
+                  <mat-option [value]="veiculo" class="veiculo-option-item">
+                    <div class="option-placa">{{ veiculo.placa }}</div>
+                    <div class="option-info">
+                      {{ veiculo.modelo?.fabricante?.nome }} {{ veiculo.modelo?.nome }} - {{ veiculo.cliente?.nome }}
+                    </div>
+                  </mat-option>
+                }
+              </mat-autocomplete>
+              <mat-hint>Digite pelo menos 2 caracteres para buscar</mat-hint>
+            </mat-form-field>
+          </div>
+        } @else {
+          <div class="veiculo-selected">
+            <div class="veiculo-badge">
+              <span class="badge-placa">{{ veiculoSelecionado()!.placa }}</span>
+            </div>
+            <div class="veiculo-details">
+              <div class="detail-row">
+                <mat-icon>directions_car</mat-icon>
+                <span>{{ veiculoSelecionado()!.modelo?.fabricante?.nome }} {{ veiculoSelecionado()!.modelo?.nome }}</span>
+                @if (veiculoSelecionado()!.cor) {
+                  <span class="cor">{{ veiculoSelecionado()!.cor }}</span>
+                }
+              </div>
+              <div class="detail-row">
+                <mat-icon>person</mat-icon>
+                <span>{{ veiculoSelecionado()!.cliente?.nome }}</span>
+              </div>
+            </div>
+            <button mat-stroked-button color="primary" (click)="clearVeiculo()" class="change-btn">
+              <mat-icon>swap_horiz</mat-icon>
+              Trocar
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Step 2: Servicos -->
+    @if (currentStep() === 1) {
+      <div class="step-content step-servicos">
+        <div class="step-title">
+          <div class="step-icon">
+            <mat-icon>build</mat-icon>
+          </div>
+          <div class="step-text">
+            <h2>Selecione os Servicos</h2>
+            <p>{{ itensOrcamento().length }} {{ itensOrcamento().length === 1 ? 'servico selecionado' : 'servicos selecionados' }}</p>
+          </div>
+        </div>
+
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput [ngModel]="servicoSearch()" (ngModelChange)="servicoSearch.set($event)" placeholder="Filtrar servicos..." />
+          @if (servicoSearch()) {
+            <button matSuffix mat-icon-button (click)="servicoSearch.set('')">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </mat-form-field>
+
+        <div class="step-servicos-list">
+          @for (servico of servicosFiltrados(); track servico.id) {
+            <div
+              class="servico-item"
+              [class.selected]="isServicoAdded(servico.id)"
+              (click)="toggleServico(servico)"
+            >
+              <div class="servico-check">
+                @if (isServicoAdded(servico.id)) {
+                  <mat-icon class="checked">check_circle</mat-icon>
+                } @else {
+                  <mat-icon class="unchecked">radio_button_unchecked</mat-icon>
+                }
+              </div>
+              <div class="servico-content">
+                <span class="servico-nome">{{ servico.nome }}</span>
+                <span class="servico-tipo" [class]="servico.tipo.toLowerCase()">
+                  {{ servico.tipo === 'SERVICO' ? 'Servico' : 'Adicional' }}
+                </span>
+              </div>
+              <div class="servico-valor">
+                {{ servico.valor | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+              </div>
+            </div>
+          }
+          @if (servicosFiltrados().length === 0) {
+            <div class="empty-state">
+              <mat-icon>search_off</mat-icon>
+              <span>Nenhum servico encontrado</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Step 3: Resumo -->
+    @if (currentStep() === 2) {
+      <div class="step-content step-resumo">
+        <div class="step-title">
+          <div class="step-icon">
+            <mat-icon>receipt_long</mat-icon>
+          </div>
+          <div class="step-text">
+            <h2>Resumo do Orcamento</h2>
+            <p>Confira e ajuste os valores</p>
+          </div>
+        </div>
+
+        <!-- Veiculo resumo -->
+        <div class="resumo-veiculo">
+          <span class="resumo-placa">{{ veiculoSelecionado()!.placa }}</span>
+          <span class="resumo-info">{{ veiculoSelecionado()!.cliente?.nome }}</span>
+        </div>
+
+        <!-- Itens do orcamento -->
+        <div class="resumo-itens">
+          @for (item of itensOrcamento(); track item.servicoId; let i = $index) {
+            <div class="resumo-item">
+              <div class="item-left">
+                <span class="item-nome">{{ item.servicoNome }}</span>
+                <span class="item-tipo" [class]="item.servicoTipo.toLowerCase()">
+                  {{ item.servicoTipo === 'SERVICO' ? 'Servico' : 'Adicional' }}
+                </span>
+              </div>
+              <div class="item-right">
+                <div class="valor-edit">
+                  <span class="currency">R$</span>
+                  <input
+                    type="number"
+                    [value]="item.valor"
+                    (change)="updateValor(i, $event)"
+                    (focus)="$any($event.target).select()"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+                <button mat-icon-button (click)="removeItem(i)" class="remove-btn">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Total -->
+        <div class="resumo-total">
+          <span class="total-label">Total do Orcamento</span>
+          <span class="total-valor">{{ valorTotal() | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+        </div>
+
+        @if (error()) {
+          <div class="error-message">
+            <mat-icon>error</mat-icon>
+            {{ error() }}
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Navigation footer -->
+  <div class="stepper-footer">
+    <div class="footer-content">
+      @if (currentStep() > 0) {
+        <button mat-stroked-button (click)="previousStep()" class="btn-back">
+          <mat-icon>arrow_back</mat-icon>
+          Voltar
+        </button>
+      } @else {
+        <button mat-stroked-button routerLink="/ordens" class="btn-cancel">
+          Cancelar
+        </button>
+      }
+
+      @if (currentStep() < 2) {
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="nextStep()"
+          [disabled]="!canProceed()"
+          class="btn-next"
+        >
+          Proximo
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      } @else {
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="save()"
+          [disabled]="loading() || !canSave()"
+          class="btn-save"
+        >
+          @if (loading()) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            Salvar OS
+          }
+        </button>
+      }
+    </div>
+  </div>
+}

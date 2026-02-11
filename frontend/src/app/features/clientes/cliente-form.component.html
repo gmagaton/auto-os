@@ -1,0 +1,47 @@
+<h2 mat-dialog-title>{{ data?.cliente ? 'Editar' : 'Novo' }} Cliente</h2>
+<mat-dialog-content>
+  <form [formGroup]="form" class="form-container">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nome</mat-label>
+      <input matInput formControlName="nome" />
+      @if (form.get('nome')?.hasError('required') && form.get('nome')?.touched) {
+        <mat-error>Nome e obrigatorio</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Telefone</mat-label>
+      <input matInput formControlName="telefone" mask="(00) 00000-0000" />
+      @if (form.get('telefone')?.hasError('required') && form.get('telefone')?.touched) {
+        <mat-error>Telefone e obrigatorio</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" formControlName="email" />
+      @if (form.get('email')?.hasError('email') && form.get('email')?.touched) {
+        <mat-error>Email invalido</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Documento (CPF/CNPJ)</mat-label>
+      <input matInput formControlName="documento" />
+    </mat-form-field>
+
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close [disabled]="loading()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="save()" [disabled]="loading() || form.invalid">
+    @if (loading()) {
+      <mat-spinner diameter="20"></mat-spinner>
+    } @else {
+      Salvar
+    }
+  </button>
+</mat-dialog-actions>

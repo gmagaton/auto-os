@@ -1,0 +1,195 @@
+// ===========================================
+// DESIGN SYSTEM - AutoOS
+// Paleta baseada no branding oficial
+// ===========================================
+
+// ===========================================
+// COLORS
+// ===========================================
+
+// Brand Colors (baseado no branding.png)
+$primary-color: #0D4B8C;        // Azul principal do logo
+$primary-light: #1565C0;
+$primary-dark: #0A3D7A;
+$primary-contrast: #ffffff;
+
+$accent-color: #F7941D;         // Laranja do logo
+$accent-light: #FFB74D;
+$accent-dark: #E67E00;
+
+// Semantic Colors
+$success-color: #2f855a;
+$success-light: #68d391;
+$success-dark: #276749;
+
+$warning-color: #d97706;
+$warning-light: #fbbf24;
+$warning-dark: #b45309;
+
+$info-color: #2563eb;
+$info-light: #60a5fa;
+$info-dark: #1e40af;
+
+$error-color: #b91c1c;
+$error-light: #f87171;
+$error-dark: #7f1d1d;
+
+// Text Colors
+$text-primary: #111827;
+$text-secondary: #4b5563;
+$text-disabled: #9ca3af;
+$text-hint: #6b7280;
+$text-inverse: #ffffff;
+
+// Background Colors
+$background-default: #f3f4f6;
+$background-paper: #ffffff;
+$background-elevated: #f9fafb;
+$background-hover: rgba(0, 0, 0, 0.05);
+$background-selected: rgba(31, 58, 95, 0.12);
+$background-disabled: #e5e7eb;
+
+// Border Colors
+$border-color: #d1d5db;
+$border-light: #e5e7eb;
+$divider-color: #d1d5db;
+
+// ===========================================
+// STATUS - Ordens de Servico
+// ===========================================
+
+$status-aguardando-bg: #fff7ed;
+$status-aguardando-text: #9a3412;
+$status-aguardando-border: #fdba74;
+
+$status-aprovado-bg: #eff6ff;
+$status-aprovado-text: #1e3a8a;
+$status-aprovado-border: #93c5fd;
+
+$status-agendado-bg: #f1f5f9;
+$status-agendado-text: #334155;
+$status-agendado-border: #cbd5e1;
+
+$status-em-andamento-bg: #ecfdf5;
+$status-em-andamento-text: #065f46;
+$status-em-andamento-border: #6ee7b7;
+
+$status-finalizado-bg: #f8fafc;
+$status-finalizado-text: #1f2933;
+$status-finalizado-border: #cbd5e1;
+
+$status-cancelado-bg: #fef2f2;
+$status-cancelado-text: #7f1d1d;
+$status-cancelado-border: #fca5a5;
+
+// ===========================================
+// SPACING
+// ===========================================
+
+$spacing-xxs: 2px;
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-xxl: 48px;
+$spacing-xxxl: 64px;
+
+// ===========================================
+// BORDER RADIUS
+// ===========================================
+
+$border-radius-xs: 2px;
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 12px;
+$border-radius-xl: 16px;
+$border-radius-full: 9999px;
+
+// ===========================================
+// SHADOWS
+// ===========================================
+
+$shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1),
+            0 1px 2px rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1),
+            0 2px 4px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1),
+            0 4px 6px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1),
+            0 10px 10px rgba(0, 0, 0, 0.04);
+
+// ===========================================
+// LAYOUT
+// ===========================================
+
+$sidenav-width: 260px;
+$sidenav-collapsed-width: 64px;
+$toolbar-height: 64px;
+$toolbar-height-mobile: 56px;
+
+$content-max-width: 1400px;
+$content-narrow-width: 900px;
+$portal-max-width: 800px;
+$form-max-width: 500px;
+$dialog-width: 480px;
+$card-max-width: 400px;
+$search-max-width: 400px;
+
+// ===========================================
+// BREAKPOINTS
+// ===========================================
+
+$breakpoint-xs: 0;
+$breakpoint-sm: 600px;
+$breakpoint-md: 960px;
+$breakpoint-lg: 1280px;
+$breakpoint-xl: 1920px;
+
+// ===========================================
+// TYPOGRAPHY
+// ===========================================
+
+$font-family-base: 'Inter', 'Roboto', -apple-system,
+  BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$font-family-mono: 'Roboto Mono', 'Consolas', monospace;
+
+$font-size-xs: 0.6875rem;   // 11px
+$font-size-sm: 0.75rem;     // 12px
+$font-size-base: 0.875rem;  // 14px
+$font-size-md: 1rem;        // 16px
+$font-size-lg: 1.125rem;    // 18px
+$font-size-xl: 1.25rem;     // 20px
+$font-size-xxl: 1.5rem;     // 24px
+$font-size-xxxl: 1.875rem;  // 30px
+
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+$line-height-tight: 1.25;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.75;
+
+// ===========================================
+// TRANSITIONS
+// ===========================================
+
+$transition-fast: 150ms ease;
+$transition-normal: 250ms ease;
+$transition-slow: 350ms ease;
+
+// ===========================================
+// Z-INDEX
+// ===========================================
+
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;

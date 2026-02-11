@@ -1,0 +1,111 @@
+@if (loading()) {
+  <div class="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+} @else if (totalItens() === 0) {
+  <div class="empty">
+    <mat-icon>checklist</mat-icon>
+    <p>Nenhum item de checklist configurado</p>
+  </div>
+} @else {
+  <div class="checklist-card-swipe">
+    <!-- Header com progresso -->
+    <div class="checklist-header">
+      <span class="checklist-title">Checklist de Entrada</span>
+      <span class="checklist-counter">{{ preenchidosCount() }}/{{ totalItens() }}</span>
+    </div>
+    <mat-progress-bar mode="determinate" [value]="progressPercent()"></mat-progress-bar>
+
+    <!-- Card do item atual -->
+    @for (item of [itens()[currentIndex()]]; track currentIndex()) {
+      @if (item) {
+        <div class="checklist-card">
+          <span class="item-categoria">{{ item.categoria }}</span>
+          <h3 class="item-nome">{{ item.nome }}</h3>
+
+          <!-- Botões de status -->
+          <div class="status-buttons">
+            <button
+              mat-raised-button
+              [class.selected]="item.status === 'OK'"
+              [class.status-ok]="item.status === 'OK'"
+              (click)="setStatus('OK')"
+              [disabled]="disabled()">
+              <mat-icon>check</mat-icon>
+              OK
+            </button>
+            <button
+              mat-raised-button
+              [class.selected]="item.status === 'DEFEITO'"
+              [class.status-defeito]="item.status === 'DEFEITO'"
+              (click)="setStatus('DEFEITO')"
+              [disabled]="disabled()">
+              <mat-icon>warning</mat-icon>
+              Defeito
+            </button>
+            <button
+              mat-raised-button
+              [class.selected]="item.status === 'NAO_APLICA'"
+              [class.status-na]="item.status === 'NAO_APLICA'"
+              (click)="setStatus('NAO_APLICA')"
+              [disabled]="disabled()">
+              <mat-icon>remove</mat-icon>
+              N/A
+            </button>
+          </div>
+
+          <!-- Campo de observação (só para defeito) -->
+          @if (item.status === 'DEFEITO') {
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Observação (obrigatória)</mat-label>
+              <textarea
+                matInput
+                [value]="item.observacao"
+                (input)="updateObservacao($any($event.target).value)"
+                rows="2"
+                [disabled]="disabled()">
+              </textarea>
+            </mat-form-field>
+          }
+        </div>
+      }
+    }
+
+    <!-- Navegação -->
+    <div class="checklist-nav">
+      <button
+        mat-icon-button
+        (click)="voltar()"
+        [disabled]="currentIndex() === 0">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+
+      <span class="nav-info">
+        @if (faltamCount() > 0) {
+          Faltam {{ faltamCount() }}
+        } @else {
+          <mat-icon class="complete-icon">check_circle</mat-icon>
+          Completo
+        }
+      </span>
+
+      <button
+        mat-icon-button
+        (click)="avancar()"
+        [disabled]="currentIndex() >= totalItens() - 1">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+
+    <!-- Ação rápida -->
+    @if (faltamCount() > 0 && !disabled()) {
+      <button
+        mat-stroked-button
+        class="mark-all-btn"
+        (click)="marcarTodosOk()">
+        <mat-icon>done_all</mat-icon>
+        Marcar restantes como OK
+      </button>
+    }
+  </div>
+}

@@ -1,0 +1,587 @@
+// ===========================================
+// RESPONSIVE STYLES - Mobile First
+// ===========================================
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// ===========================================
+// GLOBAL MOBILE ADJUSTMENTS
+// ===========================================
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+// ===========================================
+// TOUCH-FRIENDLY BUTTONS (min 44px)
+// ===========================================
+
+@include mobile-tablet {
+  // All buttons minimum touch target
+  button,
+  [mat-button],
+  [mat-raised-button],
+  [mat-flat-button],
+  [mat-stroked-button],
+  [mat-icon-button] {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+
+  // Raised/Flat buttons with text
+  .mat-mdc-raised-button,
+  .mat-mdc-flat-button,
+  .mat-mdc-button {
+    padding: $spacing-sm $spacing-lg !important;
+    font-size: $font-size-md !important;
+  }
+
+  // Icon buttons
+  .mat-mdc-icon-button {
+    width: 48px !important;
+    height: 48px !important;
+
+    .mat-icon {
+      font-size: 24px !important;
+      width: 24px !important;
+      height: 24px !important;
+    }
+  }
+
+  // FAB buttons
+  .mat-mdc-fab,
+  .mat-mdc-mini-fab {
+    width: 56px !important;
+    height: 56px !important;
+  }
+}
+
+// ===========================================
+// RESPONSIVE TABLES -> CARDS
+// ===========================================
+
+// Hide table headers on mobile, show data as cards
+.responsive-table {
+  @include mobile {
+    // Hide the table header
+    .mat-mdc-header-row {
+      display: none !important;
+    }
+
+    // Make each row a card
+    .mat-mdc-table {
+      display: block !important;
+    }
+
+    .mat-mdc-row {
+      display: flex !important;
+      flex-direction: column !important;
+      padding: $spacing-md !important;
+      margin-bottom: $spacing-sm !important;
+      border: 1px solid $border-color !important;
+      border-radius: $border-radius-md !important;
+      background: $background-paper !important;
+
+      &:hover {
+        background: $background-paper !important;
+      }
+    }
+
+    .mat-mdc-cell {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      padding: $spacing-xs 0 !important;
+      border-bottom: 1px solid $border-light !important;
+      min-height: auto !important;
+
+      &:last-child {
+        border-bottom: none !important;
+      }
+
+      // Add label from data-label attribute
+      &::before {
+        content: attr(data-label);
+        font-weight: $font-weight-semibold;
+        color: $text-secondary;
+        font-size: $font-size-sm;
+        text-transform: uppercase;
+        margin-right: $spacing-md;
+        flex-shrink: 0;
+      }
+    }
+
+    // Actions column - full width at bottom
+    .mat-column-acoes,
+    .mat-column-actions {
+      justify-content: flex-end !important;
+      padding-top: $spacing-sm !important;
+      margin-top: $spacing-xs !important;
+      border-top: 1px solid $border-light !important;
+      border-bottom: none !important;
+
+      &::before {
+        display: none !important;
+      }
+    }
+  }
+}
+
+// Alternative: Simple scrollable table with minimum column widths
+.table-scroll-mobile {
+  @include mobile {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 (-$spacing-md);
+    padding: 0 $spacing-md;
+
+    .mat-mdc-table {
+      min-width: 600px;
+    }
+  }
+}
+
+// ===========================================
+// MOBILE DATA CARDS (alternative to tables)
+// ===========================================
+
+.data-card {
+  background: $background-paper;
+  border-radius: $border-radius-lg;
+  padding: $spacing-md;
+  margin-bottom: $spacing-sm;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: none;
+  transition: all $transition-fast;
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  &-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-md;
+
+    // Left side with title/subtitle
+    > div:first-child {
+      flex: 1;
+      min-width: 0; // Allows text to shrink
+    }
+
+    // Status badge - prevent breaking
+    .status-badge {
+      flex-shrink: 0;
+      font-size: 10px;
+      padding: 4px 8px;
+      max-height: 24px;
+    }
+  }
+
+  &-title {
+    font-weight: $font-weight-bold;
+    font-size: $font-size-lg;
+    color: $primary-color;
+    letter-spacing: 1px;
+  }
+
+  &-subtitle {
+    font-size: $font-size-sm;
+    color: $text-primary;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &-body {
+    @include flex-column;
+    gap: $spacing-sm;
+    background: $background-default;
+    border-radius: $border-radius-md;
+    padding: $spacing-sm $spacing-md;
+    margin-bottom: $spacing-sm;
+  }
+
+  &-row {
+    @include flex-between;
+    font-size: $font-size-sm;
+
+    .label {
+      color: $text-secondary;
+      font-weight: $font-weight-medium;
+    }
+
+    .value {
+      font-weight: $font-weight-semibold;
+      color: $text-primary;
+      text-align: right;
+    }
+  }
+
+  &-actions {
+    @include flex-end;
+    gap: $spacing-sm;
+    padding-top: $spacing-xs;
+
+    button {
+      &.mat-mdc-icon-button {
+        width: 40px;
+        height: 40px;
+      }
+    }
+  }
+}
+
+// ===========================================
+// MOBILE NAVIGATION & LAYOUT
+// ===========================================
+
+@include mobile {
+  // Content area
+  .content,
+  .main-content {
+    padding: $spacing-md !important;
+  }
+
+  // Page headers
+  .page-header,
+  .header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: $spacing-md !important;
+
+    h1 {
+      font-size: $font-size-xl !important;
+      text-align: center;
+    }
+
+    // Stack buttons
+    .header-actions,
+    > button {
+      width: 100% !important;
+    }
+
+    button[mat-raised-button],
+    button[mat-flat-button] {
+      width: 100% !important;
+      justify-content: center !important;
+    }
+  }
+
+  // Sections
+  .section {
+    padding: $spacing-md !important;
+    margin-bottom: $spacing-md !important;
+  }
+
+  // Forms
+  .form-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .form-actions {
+    flex-direction: column !important;
+    gap: $spacing-sm !important;
+
+    button {
+      width: 100% !important;
+    }
+  }
+
+  // Dialog
+  .mat-mdc-dialog-container {
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    width: 100vw !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  .mat-mdc-dialog-content {
+    max-height: calc(100vh - 150px) !important;
+  }
+
+  .mat-mdc-dialog-actions {
+    flex-direction: column !important;
+    gap: $spacing-sm !important;
+    padding: $spacing-md !important;
+
+    button {
+      width: 100% !important;
+      margin: 0 !important;
+    }
+  }
+
+  // Info grids
+  .info-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  // Cards grid
+  .cards-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  // Hide elements on mobile
+  .hide-mobile {
+    display: none !important;
+  }
+
+  // Show elements only on mobile
+  .show-mobile {
+    display: block !important;
+  }
+}
+
+// Show mobile - hidden by default on desktop
+.show-mobile {
+  display: none;
+
+  @include mobile {
+    display: block !important;
+  }
+}
+
+// Mobile cards container
+.mobile-cards {
+  @include flex-column;
+  gap: $spacing-sm;
+}
+
+// ===========================================
+// TABLET ADJUSTMENTS
+// ===========================================
+
+@include tablet {
+  .page-header,
+  .header {
+    h1 {
+      font-size: $font-size-xl !important;
+    }
+  }
+
+  .info-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+// ===========================================
+// EXPANSION PANELS (Mobile friendly)
+// ===========================================
+
+@include mobile {
+  .mat-expansion-panel {
+    margin-bottom: $spacing-sm !important;
+
+    .mat-expansion-panel-header {
+      padding: $spacing-md !important;
+      min-height: 56px !important;
+    }
+
+    .mat-expansion-panel-body {
+      padding: $spacing-md !important;
+    }
+  }
+
+  .panel-actions {
+    flex-direction: column !important;
+    gap: $spacing-sm !important;
+
+    button {
+      width: 100% !important;
+      justify-content: center !important;
+    }
+  }
+
+  .mat-list-item {
+    min-height: 56px !important;
+  }
+}
+
+// ===========================================
+// SEARCH & FILTERS (Mobile)
+// ===========================================
+
+@include mobile {
+  .search-container {
+    margin-bottom: $spacing-md !important;
+  }
+
+  .search-field {
+    max-width: 100% !important;
+  }
+
+  .filters {
+    .mat-button-toggle-group {
+      width: 100% !important;
+      display: flex !important;
+
+      .mat-button-toggle {
+        flex: 1 !important;
+
+        .mat-button-toggle-label-content {
+          padding: 0 $spacing-sm !important;
+          font-size: $font-size-sm !important;
+        }
+      }
+    }
+  }
+
+  .filter-row {
+    flex-direction: column !important;
+
+    > * {
+      width: 100% !important;
+    }
+  }
+}
+
+// ===========================================
+// STATUS BADGES (Touch friendly)
+// ===========================================
+
+@include mobile {
+  .status-badge {
+    padding: $spacing-sm $spacing-md !important;
+    font-size: $font-size-sm !important;
+  }
+}
+
+// ===========================================
+// SNACKBAR (Mobile)
+// ===========================================
+
+@include mobile {
+  .mat-mdc-snack-bar-container {
+    margin: $spacing-md !important;
+    max-width: calc(100vw - #{$spacing-lg * 2}) !important;
+  }
+}
+
+// ===========================================
+// TOOLBAR (Mobile)
+// ===========================================
+
+@include mobile {
+  mat-toolbar {
+    padding: 0 $spacing-sm !important;
+
+    > span:not(.spacer) {
+      font-size: $font-size-md !important;
+      flex: 1;
+      text-align: center;
+      margin: 0 !important;
+    }
+
+    // Hide user name on mobile, show only icon
+    button[mat-button] {
+      padding: 0 $spacing-xs !important;
+      min-width: 44px !important;
+
+      span:not(.mat-icon) {
+        display: none !important;
+      }
+
+      .mat-icon {
+        margin: 0 !important;
+      }
+    }
+  }
+}
+
+// ===========================================
+// MENU PANEL (Mobile)
+// ===========================================
+
+@include mobile {
+  .mat-mdc-menu-panel {
+    min-width: 200px !important;
+  }
+
+  .mat-mdc-menu-item {
+    min-height: 48px !important;
+    font-size: $font-size-md !important;
+  }
+}
+
+// ===========================================
+// FORM FIELDS (Mobile)
+// ===========================================
+
+@include mobile {
+  .mat-mdc-form-field {
+    margin-bottom: $spacing-sm !important;
+  }
+
+  // Larger touch targets for inputs
+  .mdc-text-field {
+    min-height: 56px !important;
+  }
+
+  .mat-mdc-select {
+    min-height: 48px !important;
+  }
+
+  // Checkbox and radio larger
+  .mat-mdc-checkbox,
+  .mat-mdc-radio-button {
+    .mdc-checkbox,
+    .mdc-radio {
+      padding: $spacing-sm !important;
+    }
+  }
+}
+
+// ===========================================
+// TOTAL SECTION (Mobile)
+// ===========================================
+
+@include mobile {
+  .total-section {
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: $spacing-sm !important;
+  }
+
+  .total-value {
+    font-size: $font-size-xxl !important;
+  }
+}
+
+// ===========================================
+// BACK LINK (Mobile)
+// ===========================================
+
+@include mobile {
+  .back-link {
+    padding: $spacing-sm 0 !important;
+    font-size: $font-size-md !important;
+  }
+}
+
+// ===========================================
+// LOADING STATES (Mobile)
+// ===========================================
+
+@include mobile {
+  .loading,
+  .loading-with-text {
+    padding: $spacing-xl !important;
+  }
+
+  .empty-message {
+    padding: $spacing-xl !important;
+
+    mat-icon {
+      font-size: 48px !important;
+      width: 48px !important;
+      height: 48px !important;
+    }
+  }
+}

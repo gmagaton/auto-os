@@ -1,0 +1,254 @@
+// ===========================================
+// PORTAL STYLES - Customer Public Portal
+// Reutiliza estilos de _components.scss
+// ===========================================
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// ===========================================
+// PORTAL CONTAINER
+// ===========================================
+
+.portal-container {
+  min-height: 100vh;
+  background: $background-default;
+
+  // Override ordem-resumo for portal - always column layout
+  .ordem-resumo {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    text-align: center;
+
+    .resumo-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      text-align: center;
+    }
+
+    .resumo-placa {
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+      color: $primary-color;
+      letter-spacing: 2px;
+    }
+
+    .resumo-detalhe {
+      font-size: $font-size-sm;
+      color: $text-secondary;
+    }
+
+    .resumo-total {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: $spacing-md;
+      background: $background-default;
+      border-radius: $border-radius-md;
+      text-align: center;
+
+      .total-label {
+        display: block;
+        font-size: $font-size-xs;
+        color: $text-secondary;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .total-valor {
+        font-size: $font-size-xxl;
+        font-weight: $font-weight-bold;
+        color: $success-color;
+      }
+    }
+  }
+}
+
+.portal-content {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: $spacing-md;
+  @include fade-in;
+}
+
+// ===========================================
+// PORTAL HEADER
+// ===========================================
+
+.portal-header {
+  text-align: center;
+  padding: $spacing-lg $spacing-md;
+  margin-bottom: $spacing-md;
+  background: linear-gradient(135deg, $primary-dark 0%, $primary-color 100%);
+  border-radius: $border-radius-lg;
+}
+
+.portal-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .portal-logo-img {
+    max-width: 200px;
+    height: auto;
+    border-radius: $border-radius-sm;
+
+    @include mobile {
+      max-width: 160px;
+    }
+  }
+}
+
+// ===========================================
+// PORTAL STATUS CARD
+// ===========================================
+
+.portal-status-card {
+  text-align: center;
+}
+
+.portal-status-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-sm;
+
+  .status-badge-lg {
+    font-size: $font-size-md;
+    padding: $spacing-sm $spacing-lg;
+  }
+
+  .portal-status-description {
+    margin: 0;
+    color: $text-secondary;
+    font-size: $font-size-sm;
+  }
+}
+
+// ===========================================
+// PORTAL APPROVE SECTION
+// ===========================================
+
+.portal-approve-section {
+  margin-bottom: $spacing-md;
+
+  .portal-approve-btn {
+    width: 100%;
+    height: 56px;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    border-radius: $border-radius-lg;
+
+    .mdc-button__label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: $spacing-sm;
+    }
+
+    mat-icon {
+      margin: 0;
+    }
+
+    mat-spinner {
+      margin: 0 auto;
+    }
+  }
+}
+
+// ===========================================
+// PORTAL CHECKLIST (estilo extra)
+// ===========================================
+
+.checklist-row {
+  .check-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    margin-right: $spacing-xs;
+  }
+
+  &.check-ok .check-icon {
+    color: $success-color;
+  }
+
+  &.check-defeito .check-icon {
+    color: $warning-color;
+  }
+
+  &.check-nao-aplica .check-icon,
+  &.check-na .check-icon {
+    color: $text-secondary;
+  }
+
+  .check-obs {
+    font-size: $font-size-xs;
+    color: $text-secondary;
+    font-style: italic;
+  }
+}
+
+// ===========================================
+// PORTAL FOOTER
+// ===========================================
+
+.portal-footer {
+  text-align: center;
+  padding: $spacing-lg $spacing-md;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+
+  p {
+    margin: $spacing-xs 0;
+  }
+}
+
+// ===========================================
+// PORTAL ERROR CARD
+// ===========================================
+
+.portal-error-card {
+  text-align: center;
+  padding: $spacing-xxl $spacing-lg;
+  background: $background-paper;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-sm;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: $error-color;
+    margin-bottom: $spacing-md;
+  }
+
+  h2 {
+    margin: 0 0 $spacing-sm;
+    color: $text-primary;
+  }
+
+  p {
+    color: $text-secondary;
+    margin: 0;
+  }
+}
+
+// ===========================================
+// PORTAL LOADING
+// ===========================================
+
+.portal-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: $spacing-lg;
+
+  p {
+    color: $text-secondary;
+    margin: 0;
+  }
+}

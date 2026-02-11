@@ -1,0 +1,209 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// === AUTENTICACAO ===
+
+model Usuario {
+  id        String   @id @default(cuid())
+  nome      String
+  email     String   @unique
+  senha     String
+  papel     Papel    @default(ATENDENTE)
+  ativo     Boolean  @default(true)
+  criadoEm  DateTime @default(now())
+
+  ordens     OrdemServico[]
+  checklists ChecklistPreenchido[]
+  historicos HistoricoStatus[]
+}
+
+enum Papel {
+  ADMIN
+  ATENDENTE
+}
+
+// === CLIENTES E VEICULOS ===
+
+model Cliente {
+  id        String   @id @default(cuid())
+  nome      String
+  telefone  String
+  email     String?
+  documento String?
+  criadoEm  DateTime @default(now())
+
+  veiculos  Veiculo[]
+}
+
+model Fabricante {
+  id        String   @id @default(cuid())
+  nome      String   @unique
+  ativo     Boolean  @default(true)
+  criadoEm  DateTime @default(now())
+
+  modelos   Modelo[]
+}
+
+model Modelo {
+  id           String     @id @default(cuid())
+  nome         String
+  ativo        Boolean    @default(true)
+  criadoEm     DateTime   @default(now())
+
+  fabricanteId String
+  fabricante   Fabricante @relation(fields: [fabricanteId], references: [id])
+
+  veiculos     Veiculo[]
+
+  @@unique([fabricanteId, nome])
+}
+
+model Veiculo {
+  id        String   @id @default(cuid())
+  placa     String
+  cor       String
+  ano       Int?
+  criadoEm  DateTime @default(now())
+
+  modeloId  String
+  modelo    Modelo   @relation(fields: [modeloId], references: [id])
+
+  clienteId String
+  cliente   Cliente  @relation(fields: [clienteId], references: [id])
+
+  ordens    OrdemServico[]
+}
+
+// === SERVICOS ===
+
+model Servico {
+  id        String      @id @default(cuid())
+  nome      String
+  tipo      TipoServico
+  valor     Decimal     @db.Decimal(10, 2)
+  ativo     Boolean     @default(true)
+  criadoEm  DateTime    @default(now())
+
+  itens     ItemOrcamento[]
+}
+
+enum TipoServico {
+  SERVICO
+  ADICIONAL
+}
+
+// === ORDENS DE SERVICO ===
+
+model OrdemServico {
+  id           String    @id @default(cuid())
+  token        String    @unique @default(cuid())
+  status       StatusOS  @default(AGUARDANDO)
+  valorTotal   Decimal   @db.Decimal(10, 2)
+  dataAgendada DateTime?
+  aprovadoEm   DateTime?
+  criadoEm     DateTime  @default(now())
+  atualizadoEm DateTime  @updatedAt
+
+  veiculoId    String
+  veiculo      Veiculo   @relation(fields: [veiculoId], references: [id])
+
+  usuarioId    String
+  usuario      Usuario   @relation(fields: [usuarioId], references: [id])
+
+  itens        ItemOrcamento[]
+  fotos        Foto[]
+  checklist    ChecklistPreenchido[]
+  historico    HistoricoStatus[]
+}
+
+enum StatusOS {
+  AGUARDANDO
+  APROVADO
+  AGENDADO
+  EM_ANDAMENTO
+  FINALIZADO
+}
+
+model HistoricoStatus {
+  id         String    @id @default(cuid())
+  statusDe   StatusOS?
+  statusPara StatusOS
+  criadoEm   DateTime  @default(now())
+
+  ordemId    String
+  ordem      OrdemServico @relation(fields: [ordemId], references: [id], onDelete: Cascade)
+
+  usuarioId  String?
+  usuario    Usuario? @relation(fields: [usuarioId], references: [id])
+}
+
+model ItemOrcamento {
+  id        String       @id @default(cuid())
+  valor     Decimal      @db.Decimal(10, 2)
+
+  ordemId   String
+  ordem     OrdemServico @relation(fields: [ordemId], references: [id], onDelete: Cascade)
+
+  servicoId String
+  servico   Servico      @relation(fields: [servicoId], references: [id])
+}
+
+model Foto {
+  id        String       @id @default(cuid())
+  url       String
+  tipo      TipoFoto
+  criadoEm  DateTime     @default(now())
+
+  ordemId   String
+  ordem     OrdemServico @relation(fields: [ordemId], references: [id], onDelete: Cascade)
+}
+
+enum TipoFoto {
+  ENTRADA
+  PROGRESSO
+  FINAL
+}
+
+// === CHECKLIST ===
+
+model ItemChecklist {
+  id        String   @id @default(cuid())
+  nome      String
+  categoria String
+  ordem     Int
+  ativo     Boolean  @default(true)
+  criadoEm  DateTime @default(now())
+
+  preenchidos ChecklistPreenchido[]
+}
+
+model ChecklistPreenchido {
+  id         String          @id @default(cuid())
+  status     StatusChecklist
+  observacao String?
+  criadoEm   DateTime        @default(now())
+
+  ordemId    String
+  ordem      OrdemServico    @relation(fields: [ordemId], references: [id], onDelete: Cascade)
+
+  itemId     String
+  item       ItemChecklist   @relation(fields: [itemId], references: [id])
+
+  usuarioId  String
+  usuario    Usuario         @relation(fields: [usuarioId], references: [id])
+
+  @@unique([ordemId, itemId])
+}
+
+enum StatusChecklist {
+  OK
+  DEFEITO
+  NAO_APLICA
+}

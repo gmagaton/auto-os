@@ -1,0 +1,108 @@
+<!-- Header compacto -->
+<div class="list-header">
+  <h1>Checklist</h1>
+  <button mat-mini-fab color="primary" (click)="openForm()" class="fab-add">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>
+
+<!-- Busca -->
+<div class="list-search">
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-icon matPrefix>search</mat-icon>
+    <input matInput [ngModel]="searchTerm()" (ngModelChange)="onSearchChange($event)" placeholder="Buscar por nome..." />
+  </mat-form-field>
+</div>
+
+<!-- Filtro por categoria -->
+<div class="status-chips">
+  <mat-chip-listbox [value]="filtroCategoria()" (change)="onCategoriaChange($event.value || '')">
+    <mat-chip-option value="">Todas</mat-chip-option>
+    @for (categoria of categorias(); track categoria) {
+      <mat-chip-option [value]="categoria">{{ categoria }}</mat-chip-option>
+    }
+  </mat-chip-listbox>
+</div>
+
+@if (loading()) {
+  <div class="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+} @else {
+  <!-- Desktop: Table view -->
+  <div class="table-container hide-mobile">
+    <table mat-table [dataSource]="itens()">
+      <ng-container matColumnDef="ordem">
+        <th mat-header-cell *matHeaderCellDef>Ordem</th>
+        <td mat-cell *matCellDef="let item">{{ item.ordem }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="nome">
+        <th mat-header-cell *matHeaderCellDef>Nome</th>
+        <td mat-cell *matCellDef="let item">{{ item.nome }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="categoria">
+        <th mat-header-cell *matHeaderCellDef>Categoria</th>
+        <td mat-cell *matCellDef="let item">
+          <mat-chip>{{ item.categoria }}</mat-chip>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="ativo">
+        <th mat-header-cell *matHeaderCellDef>Ativo</th>
+        <td mat-cell *matCellDef="let item">
+          <mat-icon [class]="item.ativo ? 'active' : 'inactive'">
+            {{ item.ativo ? 'check_circle' : 'cancel' }}
+          </mat-icon>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="acoes">
+        <th mat-header-cell *matHeaderCellDef>Acoes</th>
+        <td mat-cell *matCellDef="let item">
+          <button mat-icon-button color="primary" matTooltip="Editar" (click)="openForm(item)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button [color]="item.ativo ? 'warn' : 'primary'" [matTooltip]="item.ativo ? 'Desativar' : 'Ativar'" (click)="toggleAtivo(item)">
+            <mat-icon>{{ item.ativo ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+
+  <!-- Mobile: Lista compacta -->
+  <div class="compact-list">
+    @for (item of itens(); track item.id) {
+      <div class="compact-card" [class.inativo]="!item.ativo">
+        <div class="compact-main" (click)="openForm(item)">
+          <div class="compact-order">{{ item.ordem }}</div>
+          <div class="compact-info">
+            <span class="compact-title">{{ item.nome }}</span>
+            <span class="compact-tag categoria">{{ item.categoria }}</span>
+          </div>
+        </div>
+        <div class="compact-actions">
+          <button mat-icon-button (click)="openForm(item); $event.stopPropagation()">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button [class.toggle-off]="item.ativo" (click)="toggleAtivo(item); $event.stopPropagation()">
+            <mat-icon>{{ item.ativo ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (itens().length === 0) {
+    <div class="empty-message">
+      <mat-icon>checklist</mat-icon>
+      <h3>Nenhum item cadastrado</h3>
+      <p>Adicione itens para o checklist de entrada</p>
+    </div>
+  }
+}

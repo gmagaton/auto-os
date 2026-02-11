@@ -1,0 +1,87 @@
+<!-- Header compacto -->
+<div class="list-header">
+  <h1>Fabricantes</h1>
+  <button mat-mini-fab color="primary" (click)="openFabricanteDialog()" class="fab-add">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>
+
+<!-- Busca -->
+<div class="list-search">
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-icon matPrefix>search</mat-icon>
+    <input matInput [ngModel]="searchTerm()" (ngModelChange)="onSearchChange($event)" placeholder="Buscar fabricante..." />
+  </mat-form-field>
+</div>
+
+@if (loading()) {
+  <div class="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+} @else {
+  <div class="fabricantes-list">
+    @for (fabricante of fabricantes(); track fabricante.id) {
+      <div class="fabricante-card">
+        <!-- Header do fabricante -->
+        <div class="fabricante-header" (click)="toggleFabricante(fabricante.id)">
+          <div class="fabricante-info">
+            <span class="fabricante-nome">{{ fabricante.nome }}</span>
+            <span class="fabricante-count">{{ getModelosCount(fabricante) }} modelo(s)</span>
+          </div>
+          <div class="fabricante-actions">
+            @if (authService.isAdmin()) {
+              <button mat-icon-button (click)="openFabricanteDialog(fabricante); $event.stopPropagation()">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button class="delete-btn" (click)="deleteFabricante(fabricante); $event.stopPropagation()">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            }
+            <mat-icon class="expand-icon" [class.expanded]="isExpanded(fabricante.id)">expand_more</mat-icon>
+          </div>
+        </div>
+
+        <!-- Modelos (expandível) -->
+        @if (isExpanded(fabricante.id)) {
+          <div class="fabricante-modelos">
+            <div class="modelos-header">
+              <span>Modelos</span>
+              <button mat-icon-button color="primary" (click)="openModeloDialog(fabricante.id)">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+            @if (fabricante.modelos && fabricante.modelos.length > 0) {
+              <div class="modelos-list">
+                @for (modelo of fabricante.modelos; track modelo.id) {
+                  <div class="modelo-item">
+                    <span class="modelo-nome">{{ modelo.nome }}</span>
+                    @if (authService.isAdmin()) {
+                      <div class="modelo-actions">
+                        <button mat-icon-button (click)="openModeloDialog(fabricante.id, modelo)">
+                          <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button class="delete-btn" (click)="deleteModelo(modelo)">
+                          <mat-icon>delete_outline</mat-icon>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="empty-section">
+                <p>Nenhum modelo cadastrado</p>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    } @empty {
+      <div class="empty-message">
+        <mat-icon>directions_car</mat-icon>
+        <h3>Nenhum fabricante cadastrado</h3>
+        <p>Adicione um fabricante para comecar</p>
+      </div>
+    }
+  </div>
+}

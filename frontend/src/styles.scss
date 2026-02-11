@@ -1,0 +1,21 @@
+// ===========================================
+// MAIN STYLES - AutoOS
+// ===========================================
+
+// Global Styles (order matters - @use must come first!)
+@use 'styles/variables';
+@use 'styles/mixins';
+@use 'styles/base';
+@use 'styles/layout';
+@use 'styles/components';
+@use 'styles/branding';
+@use 'styles/portal';
+@use 'styles/utilities';
+@use 'styles/responsive';
+
+// Angular Material
+@use '@angular/material' as mat;
+@include mat.core();
+
+// Angular Material Theme (using @import as it's CSS)
+@import '@angular/material/prebuilt-themes/indigo-pink.css';

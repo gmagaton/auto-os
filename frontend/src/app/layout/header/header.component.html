@@ -1,0 +1,17 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button (click)="toggleSidenav.emit()">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span>AutoOS</span>
+  <span class="spacer"></span>
+  <button mat-button [matMenuTriggerFor]="menu">
+    <mat-icon>account_circle</mat-icon>
+    <span class="ml-2">{{ authService.usuario()?.nome }}</span>
+  </button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="authService.logout()">
+      <mat-icon>exit_to_app</mat-icon>
+      <span>Sair</span>
+    </button>
+  </mat-menu>
+</mat-toolbar>

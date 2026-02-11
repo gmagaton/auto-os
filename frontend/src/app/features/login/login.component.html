@@ -1,0 +1,38 @@
+<div class="login-container">
+  <mat-card class="login-card">
+    <div class="login-logo">
+      <img src="assets/branding/logo-horizontal.png" alt="AutoOS" class="logo-img" />
+    </div>
+    <mat-card-content>
+      <form (ngSubmit)="login()" class="login-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" [(ngModel)]="email" name="email" required />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Senha</mat-label>
+          <input matInput type="password" [(ngModel)]="senha" name="senha" required />
+        </mat-form-field>
+
+        @if (error) {
+          <div class="login-error">{{ error }}</div>
+        }
+
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          class="full-width login-btn"
+          [disabled]="loading"
+        >
+          @if (loading) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            Entrar
+          }
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,14 @@
+<div class="sidenav-header">
+  <img src="assets/branding/logo-horizontal-sm.png" alt="AutoOS" class="sidenav-logo-img" />
+</div>
+
+<mat-nav-list>
+  @for (item of menuItems; track item.route) {
+    @if (!item.adminOnly || authService.isAdmin()) {
+      <a mat-list-item [routerLink]="item.route" routerLinkActive="active" (click)="onItemClick()">
+        <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+        <span matListItemTitle>{{ item.label }}</span>
+      </a>
+    }
+  }
+</mat-nav-list>
