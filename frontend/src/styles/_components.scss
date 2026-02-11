@@ -3788,3 +3788,289 @@ ngx-charts-legend {
     }
   }
 }
+
+// ===========================================
+// LANDING PAGE
+// ===========================================
+
+.landing-hero {
+  @include flex-center;
+  min-height: 80vh;
+  padding: $spacing-xxl $spacing-md;
+  background: linear-gradient(135deg, $primary-dark 0%, $primary-color 50%, $primary-light 100%);
+  text-align: center;
+  color: $text-inverse;
+}
+
+.landing-hero-content {
+  @include flex-column-center;
+  max-width: 700px;
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: $font-weight-bold;
+    line-height: $line-height-tight;
+    margin: $spacing-lg 0 $spacing-md;
+  }
+
+  p {
+    font-size: $font-size-lg;
+    opacity: 0.9;
+    margin: 0 0 $spacing-xl;
+    line-height: $line-height-relaxed;
+  }
+
+  @include mobile {
+    h1 {
+      font-size: $font-size-xxxl;
+    }
+
+    p {
+      font-size: $font-size-base;
+    }
+  }
+}
+
+.landing-hero-logo {
+  max-width: 220px;
+  height: auto;
+
+  @include mobile {
+    max-width: 160px;
+  }
+}
+
+.landing-hero-cta {
+  font-size: $font-size-md;
+  padding: $spacing-sm $spacing-xl;
+  background: $accent-color !important;
+  color: $text-inverse !important;
+  border-radius: $border-radius-md;
+  font-weight: $font-weight-semibold;
+  text-decoration: none;
+
+  &:hover {
+    background: $accent-dark !important;
+  }
+}
+
+// Sections
+.landing-section {
+  padding: $spacing-xxxl $spacing-md;
+  max-width: 1100px;
+  margin: 0 auto;
+
+  @include mobile {
+    padding: $spacing-xxl $spacing-md;
+  }
+}
+
+.landing-section--alt {
+  max-width: 100%;
+  background: $background-default;
+
+  .landing-steps {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+}
+
+.landing-section-title {
+  text-align: center;
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $primary-color;
+  margin: 0 0 $spacing-sm;
+}
+
+.landing-section-subtitle {
+  text-align: center;
+  color: $text-secondary;
+  font-size: $font-size-md;
+  margin: 0 0 $spacing-xxl;
+}
+
+// Features Grid
+.landing-features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-lg;
+
+  @include mobile-tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+.landing-feature-card {
+  @include card;
+  padding: $spacing-lg;
+  text-align: center;
+  transition: box-shadow $transition-fast, transform $transition-fast;
+
+  &:hover {
+    box-shadow: $shadow-md;
+    transform: translateY(-4px);
+  }
+
+  h3 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    margin: $spacing-md 0 $spacing-sm;
+  }
+
+  p {
+    font-size: $font-size-base;
+    color: $text-secondary;
+    line-height: $line-height-relaxed;
+    margin: 0;
+  }
+}
+
+.landing-feature-icon {
+  @include flex-center;
+  width: 56px;
+  height: 56px;
+  border-radius: $border-radius-lg;
+  margin: 0 auto;
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  &--blue {
+    background: rgba($primary-color, 0.1);
+    color: $primary-color;
+  }
+
+  &--orange {
+    background: rgba($accent-color, 0.1);
+    color: $accent-dark;
+  }
+
+  &--green {
+    background: rgba($success-color, 0.1);
+    color: $success-color;
+  }
+
+  &--purple {
+    background: rgba(#7c3aed, 0.1);
+    color: #7c3aed;
+  }
+
+  &--red {
+    background: rgba($error-color, 0.1);
+    color: $error-color;
+  }
+
+  &--teal {
+    background: rgba($info-color, 0.1);
+    color: $info-color;
+  }
+}
+
+// Steps
+.landing-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-lg;
+
+  @include mobile-tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+.landing-step {
+  text-align: center;
+  padding: $spacing-lg;
+
+  h3 {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    margin: $spacing-md 0 $spacing-sm;
+  }
+
+  p {
+    font-size: $font-size-base;
+    color: $text-secondary;
+    line-height: $line-height-relaxed;
+    margin: 0;
+  }
+}
+
+.landing-step-number {
+  @include flex-center;
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  border-radius: $border-radius-full;
+  background: $primary-color;
+  color: $text-inverse;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+}
+
+// Portal Highlight
+.landing-portal-highlight {
+  max-width: 100%;
+  background: linear-gradient(135deg, $primary-dark, $primary-color);
+  padding: $spacing-xxxl $spacing-md;
+}
+
+.landing-portal-content {
+  @include flex-column-center;
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+  color: $text-inverse;
+
+  h2 {
+    font-size: $font-size-xxl;
+    font-weight: $font-weight-bold;
+    margin: $spacing-md 0 $spacing-md;
+  }
+
+  p {
+    font-size: $font-size-md;
+    opacity: 0.9;
+    line-height: $line-height-relaxed;
+    margin: 0 0 $spacing-xl;
+  }
+}
+
+.landing-portal-icon {
+  font-size: 48px !important;
+  width: 48px !important;
+  height: 48px !important;
+  opacity: 0.9;
+}
+
+.landing-portal-cta {
+  background: $accent-color !important;
+  color: $text-inverse !important;
+  font-weight: $font-weight-semibold;
+  padding: $spacing-sm $spacing-xl;
+  border-radius: $border-radius-md;
+  text-decoration: none;
+
+  &:hover {
+    background: $accent-dark !important;
+  }
+}
+
+// Footer
+.landing-footer {
+  text-align: center;
+  padding: $spacing-lg $spacing-md;
+  background: $text-primary;
+  color: $text-inverse;
+
+  p {
+    margin: 0;
+    font-size: $font-size-sm;
+    opacity: 0.7;
+  }
+}

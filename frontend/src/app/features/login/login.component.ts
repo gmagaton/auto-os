@@ -33,7 +33,7 @@ export class LoginComponent {
   ) {
     // Redirecionar se ja logado
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/']);
+      this.router.navigate(['/dashboard']);
     }
   }
 
@@ -43,7 +43,7 @@ export class LoginComponent {
 
     this.authService.login(this.email, this.senha).subscribe({
       next: () => {
-        this.router.navigate(['/']);
+        this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         this.loading = false;
