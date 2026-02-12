@@ -1,38 +1,49 @@
 # ============================================
-# Stage 1: Builder
+# Stage 1: Dependencies
+# ============================================
+FROM node:20-alpine AS deps
+
+WORKDIR /app
+
+# Evita download repetido
+COPY package*.json ./
+COPY prisma ./prisma/
+
+RUN npm ci
+
+RUN npx prisma generate
+
+# ============================================
+# Stage 2: Builder
 # ============================================
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
-COPY prisma ./prisma/
-
-RUN npm install
-
-# Prisma precisa do schema, não do .env
-RUN npx prisma generate
-
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/prisma ./prisma
 COPY . .
 
 RUN npm run build
 
 # ============================================
-# Stage 2: Production
+# Stage 3: Production
 # ============================================
-FROM node:20-alpine
+FROM node:20-alpine AS production
 
 WORKDIR /app
 
-RUN addgroup -g 1001 -S nodejs \
- && adduser -S nestjs -u 1001 -G nodejs
+ENV NODE_ENV=production
 
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/prisma ./prisma
+# Usuário não-root
+RUN addgroup -S nodejs && adduser -S nestjs -G nodejs
 
-RUN chown -R nestjs:nodejs /app
+# Copiar apenas o essencial (já com ownership)
+COPY --chown=nestjs:nodejs --from=builder /app/dist ./dist
+COPY --chown=nestjs:nodejs --from=deps /app/node_modules ./node_modules
+COPY --chown=nestjs:nodejs --from=builder /app/prisma ./prisma
+COPY --chown=nestjs:nodejs package*.json ./
+
 USER nestjs
 
 EXPOSE 3000
