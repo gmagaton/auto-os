@@ -8,10 +8,6 @@ dist
 .git
 .gitignore
 
-# Environment files
-.env
-.env.*
-
 # Documentation
 *.md
 

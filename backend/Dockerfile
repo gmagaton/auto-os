@@ -22,6 +22,7 @@ WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/prisma ./prisma
+COPY --from=deps /app/generated ./generated
 COPY . .
 
 RUN npm run build
@@ -48,5 +49,5 @@ USER nestjs
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "echo DATABASE_URL=$DATABASE_URL && npx prisma migrate deploy && node dist/main.js"]
+CMD ["node", "dist/main"]
 
