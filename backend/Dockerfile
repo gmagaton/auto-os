@@ -42,7 +42,6 @@ RUN addgroup -S nodejs && adduser -S nestjs -G nodejs
 COPY --chown=nestjs:nodejs --from=builder /app/dist ./dist
 COPY --chown=nestjs:nodejs --from=deps /app/node_modules ./node_modules
 COPY --chown=nestjs:nodejs --from=builder /app/prisma ./prisma
-COPY --chown=nestjs:nodejs --from=builder /app/prisma.config.ts ./
 COPY --chown=nestjs:nodejs package*.json ./
 
 USER nestjs
