@@ -47,6 +47,9 @@ COPY --chown=nestjs:nodejs package*.json ./
 COPY --chown=nestjs:nodejs --from=builder /app/prisma.config.ts ./
 COPY --chown=nestjs:nodejs docker-entrypoint.sh ./
 
+# Criar pasta uploads com permissao para o usuario nestjs
+RUN mkdir -p /app/uploads && chown nestjs:nodejs /app/uploads
+
 USER nestjs
 
 EXPOSE 3000
