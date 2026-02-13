@@ -88,7 +88,7 @@ git push -u origin main
 2. Copie a **Connection string** (formato pooled):
 
 ```
-postgresql://username:password@ep-xxxx.us-east-2.aws.neon.tech/neondb?sslmode=require
+psql 'postgresql://neondb_owner:npg_hENFZ8d6YDsA@ep-damp-resonance-aivlw4yj-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
 ```
 
 > **Importante**: Use a connection string com `?sslmode=require`
