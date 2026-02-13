@@ -5,7 +5,6 @@ FROM node:20-alpine AS deps
 
 WORKDIR /app
 
-# Evita download repetido
 COPY package*.json ./
 COPY prisma ./prisma/
 
@@ -21,11 +20,10 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/prisma ./prisma
 COPY --from=deps /app/generated ./generated
 COPY . .
 
-RUN npm run build
+RUN npx nest build
 
 # ============================================
 # Stage 3: Production
@@ -36,18 +34,19 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Usuário não-root
+# Usuario nao-root
 RUN addgroup -S nodejs && adduser -S nestjs -G nodejs
 
-# Copiar apenas o essencial (já com ownership)
+# Copiar apenas o essencial
 COPY --chown=nestjs:nodejs --from=builder /app/dist ./dist
 COPY --chown=nestjs:nodejs --from=deps /app/node_modules ./node_modules
+COPY --chown=nestjs:nodejs --from=deps /app/generated ./generated
 COPY --chown=nestjs:nodejs --from=builder /app/prisma ./prisma
 COPY --chown=nestjs:nodejs package*.json ./
+COPY --chown=nestjs:nodejs docker-entrypoint.sh ./
 
 USER nestjs
 
 EXPOSE 3000
 
-CMD ["node", "dist/main"]
-
+CMD ["sh", "docker-entrypoint.sh"]
