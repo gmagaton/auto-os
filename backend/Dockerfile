@@ -7,6 +7,7 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY prisma ./prisma/
+COPY prisma.config.ts ./
 
 RUN npm ci
 
@@ -43,6 +44,7 @@ COPY --chown=nestjs:nodejs --from=deps /app/node_modules ./node_modules
 COPY --chown=nestjs:nodejs --from=deps /app/generated ./generated
 COPY --chown=nestjs:nodejs --from=builder /app/prisma ./prisma
 COPY --chown=nestjs:nodejs package*.json ./
+COPY --chown=nestjs:nodejs --from=builder /app/prisma.config.ts ./
 COPY --chown=nestjs:nodejs docker-entrypoint.sh ./
 
 USER nestjs
