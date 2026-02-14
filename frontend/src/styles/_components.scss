@@ -92,7 +92,7 @@
 
 .form-container {
   @include flex-column;
-  gap: $spacing-md;
+  gap: $spacing-xs;
   padding: $spacing-sm 0;
 }
 
@@ -2165,17 +2165,36 @@ ngx-charts-legend {
 
     // Placa-specific input styling (larger, centered)
     .mat-mdc-input-element {
-      font-size: $font-size-xxl !important;
+      font-size: $font-size-xl !important;
       text-transform: uppercase;
-      letter-spacing: 4px;
+      letter-spacing: 3px;
       text-align: center;
       font-weight: $font-weight-bold !important;
+
+      &::placeholder {
+        font-size: $font-size-base !important;
+        font-weight: $font-weight-normal !important;
+        letter-spacing: normal;
+        color: $text-hint !important;
+      }
     }
 
     // Taller input for placa
     .mat-mdc-form-field-infix {
-      min-height: 56px !important;
-      padding: 16px 0 !important;
+      min-height: 48px !important;
+      padding: 12px 0 !important;
+    }
+
+    // Label positioning adjusted for taller field
+    .mat-mdc-floating-label {
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+    }
+
+    &.mat-focused .mat-mdc-floating-label,
+    .mdc-floating-label--float-above {
+      top: 0 !important;
+      transform: translateY(-50%) scale(0.75) !important;
     }
   }
 
@@ -3191,7 +3210,10 @@ ngx-charts-legend {
 
     mat-icon[matPrefix] {
       color: $text-secondary;
-      margin-right: $spacing-xs;
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      margin-right: -12px;
     }
   }
 }

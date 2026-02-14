@@ -68,6 +68,11 @@ export class ChecklistController {
     return this.checklistService.getChecklistByOrdem(ordemId);
   }
 
+  @Get('ordem/:ordemId/status')
+  getChecklistStatus(@Param('ordemId') ordemId: string) {
+    return this.checklistService.getChecklistStatus(ordemId);
+  }
+
   @Post('ordem/:ordemId')
   preencherChecklist(
     @Param('ordemId') ordemId: string,

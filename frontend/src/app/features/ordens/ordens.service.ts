@@ -181,6 +181,6 @@ export class OrdensService {
   }
 
   getChecklistStatus(id: string): Observable<{ preenchido: boolean; total: number; preenchidos: number }> {
-    return this.http.get<{ preenchido: boolean; total: number; preenchidos: number }>(`${this.baseUrl}/ordens/${id}/checklist/status`);
+    return this.http.get<{ preenchido: boolean; total: number; preenchidos: number }>(`${this.baseUrl}/checklist/ordem/${id}/status`);
   }
 }

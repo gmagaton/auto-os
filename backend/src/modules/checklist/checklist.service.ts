@@ -139,6 +139,22 @@ export class ChecklistService {
     }));
   }
 
+  async getChecklistStatus(ordemId: string) {
+    const total = await this.prisma.itemChecklist.count({
+      where: { ativo: true },
+    });
+
+    const preenchidos = await this.prisma.checklistPreenchido.count({
+      where: { ordemId },
+    });
+
+    return {
+      preenchido: preenchidos >= total && total > 0,
+      total,
+      preenchidos,
+    };
+  }
+
   async getChecklistByOrdemToken(token: string) {
     const ordem = await this.prisma.ordemServico.findUnique({
       where: { token },

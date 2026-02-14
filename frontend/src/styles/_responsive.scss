@@ -286,11 +286,13 @@ html, body {
   }
 
   .form-actions {
-    flex-direction: column !important;
-    gap: $spacing-sm !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    gap: $spacing-md !important;
 
     button {
-      width: 100% !important;
+      flex: 1 !important;
     }
   }
 
@@ -308,12 +310,14 @@ html, body {
   }
 
   .mat-mdc-dialog-actions {
-    flex-direction: column !important;
-    gap: $spacing-sm !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    gap: $spacing-md !important;
     padding: $spacing-md !important;
 
     button {
-      width: 100% !important;
+      flex: 1 !important;
       margin: 0 !important;
     }
   }
@@ -519,13 +523,13 @@ html, body {
     margin-bottom: $spacing-sm !important;
   }
 
-  // Larger touch targets for inputs
+  // Touch-friendly input height
   .mdc-text-field {
-    min-height: 56px !important;
+    min-height: 44px !important;
   }
 
   .mat-mdc-select {
-    min-height: 48px !important;
+    min-height: 44px !important;
   }
 
   // Checkbox and radio larger

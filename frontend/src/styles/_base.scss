@@ -236,16 +236,16 @@ input, textarea, select {
     align-items: center;
   }
 
-  // Mobile-optimized input height (touch-friendly 48px)
+  // Compact input height
   .mat-mdc-form-field-infix {
-    min-height: 48px !important;
-    padding: 12px 0 !important;
+    min-height: 40px !important;
+    padding: 8px 0 !important;
     width: 100%;
   }
 
   // Input text styling
   .mat-mdc-input-element {
-    font-size: $font-size-md !important; // 16px prevents iOS zoom
+    font-size: $font-size-base !important; // 14px
     line-height: 1.5 !important;
     color: $text-primary !important;
 
@@ -302,39 +302,30 @@ input, textarea, select {
 
   .mdc-text-field--outlined {
     background-color: $background-paper;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    border: 1px solid $border-color;
+    border-radius: $border-radius-md !important;
+    transition: border-color $transition-fast, box-shadow $transition-fast;
 
+    // Hide the 3-segment notched outline entirely
     .mdc-notched-outline {
-      .mdc-notched-outline__leading {
-        border-radius: $border-radius-md 0 0 $border-radius-md !important;
-        border-color: $border-color !important;
-      }
-
-      .mdc-notched-outline__notch {
-        border-color: $border-color !important;
-      }
-
-      .mdc-notched-outline__trailing {
-        border-radius: 0 $border-radius-md $border-radius-md 0 !important;
-        border-color: $border-color !important;
-      }
-    }
-
-    &:hover .mdc-notched-outline {
       .mdc-notched-outline__leading,
       .mdc-notched-outline__notch,
       .mdc-notched-outline__trailing {
-        border-color: $text-secondary !important;
+        border: none !important;
       }
+    }
+
+    &:hover {
+      border-color: $text-secondary;
     }
   }
 
-  &.mat-focused .mdc-text-field--outlined .mdc-notched-outline {
-    .mdc-notched-outline__leading,
-    .mdc-notched-outline__notch,
-    .mdc-notched-outline__trailing {
-      border-color: $primary-color !important;
-      border-width: 2px !important;
-    }
+  &.mat-focused .mdc-text-field--outlined {
+    border-color: $primary-color;
+    border-width: 2px;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
   }
 
   // ===========================================
@@ -343,16 +334,22 @@ input, textarea, select {
 
   .mat-mdc-floating-label {
     color: $text-secondary !important;
-    font-size: $font-size-md !important;
+    font-size: $font-size-base !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+  }
+
+  &.mat-focused .mat-mdc-floating-label,
+  .mdc-floating-label--float-above {
+    top: 0 !important;
+    transform: translateY(-50%) scale(0.75) !important;
+    font-size: $font-size-sm !important;
+    background-color: $background-paper;
+    padding: 0 4px !important;
   }
 
   &.mat-focused .mat-mdc-floating-label {
     color: $primary-color !important;
-  }
-
-  // Floated label size
-  .mdc-floating-label--float-above {
-    font-size: $font-size-sm !important;
   }
 
   // ===========================================
@@ -384,12 +381,12 @@ input, textarea, select {
 
   .mat-mdc-form-field-icon-prefix,
   .mat-mdc-form-field-icon-suffix {
-    padding: 0 8px !important;
+    padding: 0 4px !important;
 
     mat-icon {
-      font-size: 20px !important;
-      width: 20px !important;
-      height: 20px !important;
+      font-size: 18px !important;
+      width: 18px !important;
+      height: 18px !important;
       color: $text-secondary;
     }
   }
@@ -406,7 +403,7 @@ input, textarea, select {
   // ===========================================
 
   .mat-mdc-form-field-subscript-wrapper {
-    margin-top: 4px;
+    margin-top: 2px;
   }
 }
 
