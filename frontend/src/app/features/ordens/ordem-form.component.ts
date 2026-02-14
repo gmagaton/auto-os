@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, computed } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy, computed } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormControl } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CurrencyPipe } from '@angular/common';
@@ -10,11 +10,12 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { AsyncPipe } from '@angular/common';
-import { Observable, startWith, switchMap, debounceTime, of } from 'rxjs';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { Subscription, startWith, switchMap, debounceTime, of } from 'rxjs';
 import { OrdensService, Ordem } from './ordens.service';
 import { VeiculosService, Veiculo } from '../veiculos/veiculos.service';
 import { ServicosService, Servico } from '../servicos/servicos.service';
+import { CadastroRapidoVeiculoDialogComponent } from './cadastro-rapido-veiculo-dialog.component';
 
 interface ItemForm {
   servicoId: string;
@@ -31,7 +32,6 @@ interface ItemForm {
     FormsModule,
     RouterLink,
     CurrencyPipe,
-    AsyncPipe,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
@@ -39,10 +39,11 @@ interface ItemForm {
     MatIconModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
+    MatDialogModule,
   ],
   templateUrl: './ordem-form.component.html',
 })
-export class OrdemFormComponent implements OnInit {
+export class OrdemFormComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -50,6 +51,7 @@ export class OrdemFormComponent implements OnInit {
   private readonly veiculosService = inject(VeiculosService);
   private readonly servicosService = inject(ServicosService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
 
   // Stepper
   currentStep = signal(0);
@@ -63,7 +65,10 @@ export class OrdemFormComponent implements OnInit {
   servicosDisponiveis = signal<Servico[]>([]);
   veiculoSelecionado = signal<Veiculo | null>(null);
   itensOrcamento = signal<ItemForm[]>([]);
-  filteredVeiculos$!: Observable<Veiculo[]>;
+  filteredVeiculos = signal<Veiculo[]>([]);
+  noVeiculoFound = signal(false);
+  lastSearchTerm = signal('');
+  private veiculoSearchSub?: Subscription;
 
   // Search controls
   veiculoInputControl = new FormControl('');
@@ -104,19 +109,28 @@ export class OrdemFormComponent implements OnInit {
     this.isEdit = !!this.ordemId;
 
     // Setup vehicle autocomplete
-    this.filteredVeiculos$ = this.veiculoInputControl.valueChanges.pipe(
+    this.veiculoSearchSub = this.veiculoInputControl.valueChanges.pipe(
       startWith(''),
       debounceTime(300),
       switchMap((value) => {
         const searchTerm = typeof value === 'string' ? value : '';
+        this.lastSearchTerm.set(searchTerm);
         if (searchTerm.length < 2) {
+          this.noVeiculoFound.set(false);
           return of([]);
         }
         return this.veiculosService.getAll({ busca: searchTerm });
       })
-    );
+    ).subscribe((results) => {
+      this.filteredVeiculos.set(results);
+      this.noVeiculoFound.set(this.lastSearchTerm().length >= 2 && results.length === 0);
+    });
 
     this.loadInitialData();
+  }
+
+  ngOnDestroy(): void {
+    this.veiculoSearchSub?.unsubscribe();
   }
 
   private loadInitialData(): void {
@@ -207,6 +221,22 @@ export class OrdemFormComponent implements OnInit {
     this.veiculoSelecionado.set(null);
     this.form.patchValue({ veiculoId: '' });
     this.veiculoInputControl.setValue('');
+  }
+
+  openCadastroRapido(): void {
+    const dialogRef = this.dialog.open(CadastroRapidoVeiculoDialogComponent, {
+      width: '500px',
+      maxWidth: '95vw',
+      data: { placa: this.lastSearchTerm().toUpperCase() },
+    });
+
+    dialogRef.afterClosed().subscribe((veiculo: Veiculo | undefined) => {
+      if (veiculo) {
+        this.veiculoSelecionado.set(veiculo);
+        this.form.patchValue({ veiculoId: veiculo.id });
+        this.noVeiculoFound.set(false);
+      }
+    });
   }
 
   // Service methods

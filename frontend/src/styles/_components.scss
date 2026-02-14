@@ -1131,6 +1131,8 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  max-width: 100%;
+  overflow: hidden;
 
   @media (max-width: 599px) {
     gap: 16px;
@@ -1247,7 +1249,7 @@
 
 .dashboard-charts {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(450px, 100%), 1fr));
   gap: 24px;
 
   @media (max-width: 959px) {
@@ -1261,7 +1263,8 @@
 
 .chart-card {
   border-radius: $border-radius-lg;
-  overflow: visible;
+  overflow: hidden;
+  max-width: 100%;
 
   .mat-mdc-card-header {
     padding: 16px 20px 12px !important;
@@ -1281,13 +1284,15 @@
     min-height: 400px;
     height: auto;
     padding: 16px 20px 24px !important;
-    overflow: visible;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
+    max-width: 100%;
 
     @media (max-width: 599px) {
-      min-height: 360px;
-      padding: 12px 8px 20px !important;
+      min-height: auto;
+      height: 260px;
+      padding: 8px 0 12px !important;
     }
   }
 
@@ -1308,18 +1313,23 @@
 
       @media (max-width: 599px) {
         font-size: 36px;
+        height: 200px;
       }
     }
   }
 
   ngx-charts-bar-vertical,
   ngx-charts-pie-chart {
-    width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
     min-height: 350px;
     flex: 1;
+    overflow: hidden;
+    display: block;
 
     @media (max-width: 599px) {
-      min-height: 300px;
+      min-height: auto;
+      height: 100%;
     }
   }
 }
@@ -1327,6 +1337,16 @@
 // ngx-charts legend fixes
 .ngx-charts-outer {
   overflow: visible !important;
+
+  @media (max-width: 599px) {
+    overflow: hidden !important;
+    width: 100% !important;
+    max-width: 100% !important;
+
+    svg {
+      max-width: 100% !important;
+    }
+  }
 }
 
 ngx-charts-legend {
@@ -1335,6 +1355,10 @@ ngx-charts-legend {
   .legend-wrap {
     overflow: visible !important;
     width: auto !important;
+
+    @media (max-width: 599px) {
+      width: 100% !important;
+    }
   }
 }
 
@@ -1345,7 +1369,8 @@ ngx-charts-legend {
   max-width: 150px !important;
 
   @media (max-width: 599px) {
-    max-width: 120px !important;
+    max-width: 100% !important;
+    width: 100% !important;
   }
 
   .legend-labels {
@@ -1356,6 +1381,13 @@ ngx-charts-legend {
     overflow: visible !important;
     background: transparent !important;
     width: auto !important;
+
+    @media (max-width: 599px) {
+      flex-direction: row !important;
+      flex-wrap: wrap !important;
+      justify-content: center !important;
+      gap: 6px 12px !important;
+    }
   }
 
   .legend-label {
@@ -1369,7 +1401,8 @@ ngx-charts-legend {
 
     @media (max-width: 599px) {
       font-size: 11px !important;
-      max-width: 110px !important;
+      max-width: none !important;
+      margin: 0 !important;
     }
 
     &:hover {
@@ -4094,5 +4127,154 @@ ngx-charts-legend {
     margin: 0;
     font-size: $font-size-sm;
     opacity: 0.7;
+  }
+}
+
+// ===========================================
+// CADASTRO RAPIDO - No Results Action
+// ===========================================
+
+.no-results-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-lg;
+  margin-top: $spacing-md;
+  border: 2px dashed $border-color;
+  border-radius: $border-radius-md;
+  background-color: $background-elevated;
+  text-align: center;
+
+  .no-results-text {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    color: $text-secondary;
+    font-size: $font-size-md;
+
+    mat-icon {
+      color: $warning-color;
+    }
+  }
+
+  button {
+    width: 100%;
+  }
+}
+
+// ===========================================
+// CADASTRO RAPIDO - Dialog
+// ===========================================
+
+.cadastro-rapido-dialog {
+  h2[mat-dialog-title] {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin: 0;
+    font-size: $font-size-xl;
+
+    mat-icon {
+      color: $primary-color;
+    }
+  }
+
+  .placa-display {
+    text-align: center;
+    margin-bottom: $spacing-lg;
+
+    .placa-badge {
+      display: inline-block;
+      padding: $spacing-sm $spacing-lg;
+      background: linear-gradient(135deg, $primary-color, $primary-light);
+      color: $primary-contrast;
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+      letter-spacing: 2px;
+      border-radius: $border-radius-md;
+    }
+  }
+
+  .section {
+    margin-bottom: $spacing-lg;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-md;
+    padding-bottom: $spacing-sm;
+    border-bottom: 1px solid $border-light;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+
+    mat-icon {
+      color: $primary-color;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .cliente-selected {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-md;
+    background-color: $status-em-andamento-bg;
+    border: 1px solid $status-em-andamento-border;
+    border-radius: $border-radius-md;
+
+    .cliente-info {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+
+      mat-icon {
+        color: $success-color;
+      }
+
+      .telefone {
+        display: block;
+        font-size: $font-size-sm;
+        color: $text-secondary;
+      }
+    }
+  }
+
+  .inline-client-form {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  .cliente-search {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  .vehicle-form {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  mat-dialog-content {
+    min-height: 300px;
+  }
+
+  mat-dialog-actions {
+    padding: $spacing-md 0 0;
+
+    button + button {
+      margin-left: $spacing-sm;
+    }
   }
 }

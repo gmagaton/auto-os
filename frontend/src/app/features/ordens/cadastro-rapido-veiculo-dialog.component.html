@@ -1,0 +1,157 @@
+<div class="cadastro-rapido-dialog">
+  <h2 mat-dialog-title>
+    <mat-icon>add_circle</mat-icon>
+    Cadastro Rapido
+  </h2>
+
+  <mat-dialog-content>
+    <div class="placa-display">
+      <span class="placa-badge">{{ placa }}</span>
+    </div>
+
+    <!-- Secao Cliente -->
+    <div class="section">
+      <div class="section-header">
+        <mat-icon>person</mat-icon>
+        <span>Cliente</span>
+      </div>
+
+      @if (clienteSelecionado()) {
+        <div class="cliente-selected">
+          <div class="cliente-info">
+            <mat-icon>check_circle</mat-icon>
+            <div>
+              <strong>{{ clienteSelecionado()!.nome }}</strong>
+              @if (clienteSelecionado()!.telefone) {
+                <span class="telefone">{{ clienteSelecionado()!.telefone }}</span>
+              }
+            </div>
+          </div>
+          <button mat-icon-button (click)="clearCliente()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      } @else if (criandoNovoCliente()) {
+        <div class="inline-client-form" [formGroup]="clienteForm">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nome do Cliente</mat-label>
+            <input matInput formControlName="nome" />
+            @if (clienteForm.get('nome')?.hasError('required') && clienteForm.get('nome')?.touched) {
+              <mat-error>Nome e obrigatorio</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Telefone</mat-label>
+            <input matInput formControlName="telefone" mask="(00) 00000-0000" />
+            @if (clienteForm.get('telefone')?.hasError('required') && clienteForm.get('telefone')?.touched) {
+              <mat-error>Telefone e obrigatorio</mat-error>
+            }
+          </mat-form-field>
+
+          <button mat-button color="primary" (click)="toggleClienteMode()">
+            <mat-icon>search</mat-icon>
+            Buscar cliente existente
+          </button>
+        </div>
+      } @else {
+        <div class="cliente-search">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Buscar cliente</mat-label>
+            <input
+              matInput
+              [formControl]="clienteInputControl"
+              [matAutocomplete]="autoCliente"
+              autocomplete="off"
+            />
+            <mat-icon matSuffix>search</mat-icon>
+            <mat-autocomplete
+              #autoCliente="matAutocomplete"
+              [displayWith]="displayCliente"
+              (optionSelected)="onClienteSelected($event)"
+            >
+              @for (cliente of filteredClientes$ | async; track cliente.id) {
+                <mat-option [value]="cliente">
+                  <div>{{ cliente.nome }}</div>
+                  <div style="font-size: 12px; color: #666;">{{ cliente.telefone }}</div>
+                </mat-option>
+              }
+            </mat-autocomplete>
+            <mat-hint>Digite pelo menos 2 caracteres</mat-hint>
+          </mat-form-field>
+
+          <button mat-button color="primary" (click)="toggleClienteMode()">
+            <mat-icon>person_add</mat-icon>
+            Novo Cliente
+          </button>
+        </div>
+      }
+    </div>
+
+    <!-- Secao Veiculo -->
+    <div class="section">
+      <div class="section-header">
+        <mat-icon>directions_car</mat-icon>
+        <span>Veiculo</span>
+      </div>
+
+      <div class="vehicle-form" [formGroup]="veiculoForm">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Cor</mat-label>
+          <input matInput formControlName="cor" />
+          @if (veiculoForm.get('cor')?.hasError('required') && veiculoForm.get('cor')?.touched) {
+            <mat-error>Cor e obrigatoria</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Ano (opcional)</mat-label>
+          <input matInput type="number" formControlName="ano" [min]="1900" [max]="currentYear + 1" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Fabricante</mat-label>
+          <mat-select formControlName="fabricanteId" (selectionChange)="onFabricanteChange($event.value)">
+            @for (fabricante of fabricantes(); track fabricante.id) {
+              <mat-option [value]="fabricante.id">{{ fabricante.nome }}</mat-option>
+            }
+          </mat-select>
+          @if (veiculoForm.get('fabricanteId')?.hasError('required') && veiculoForm.get('fabricanteId')?.touched) {
+            <mat-error>Fabricante e obrigatorio</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Modelo</mat-label>
+          <mat-select formControlName="modeloId">
+            @for (modelo of modelos(); track modelo.id) {
+              <mat-option [value]="modelo.id">{{ modelo.nome }}</mat-option>
+            }
+          </mat-select>
+          @if (veiculoForm.get('modeloId')?.hasError('required') && veiculoForm.get('modeloId')?.touched) {
+            <mat-error>Modelo e obrigatorio</mat-error>
+          }
+          @if (modelos().length === 0 && veiculoForm.get('fabricanteId')?.value) {
+            <mat-hint>Nenhum modelo cadastrado para este fabricante</mat-hint>
+          }
+        </mat-form-field>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="cancel()">Cancelar</button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="save()"
+      [disabled]="saving() || !canSave()"
+    >
+      @if (saving()) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        Salvar
+      }
+    </button>
+  </mat-dialog-actions>
+</div>

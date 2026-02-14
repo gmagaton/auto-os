@@ -49,7 +49,7 @@
               />
               <mat-icon matSuffix>search</mat-icon>
               <mat-autocomplete #autoVeiculo="matAutocomplete" [displayWith]="displayVeiculo" (optionSelected)="onVeiculoSelected($event)">
-                @for (veiculo of filteredVeiculos$ | async; track veiculo.id) {
+                @for (veiculo of filteredVeiculos(); track veiculo.id) {
                   <mat-option [value]="veiculo" class="veiculo-option-item">
                     <div class="option-placa">{{ veiculo.placa }}</div>
                     <div class="option-info">
@@ -60,6 +60,19 @@
               </mat-autocomplete>
               <mat-hint>Digite pelo menos 2 caracteres para buscar</mat-hint>
             </mat-form-field>
+
+            @if (noVeiculoFound() && lastSearchTerm().length >= 2) {
+              <div class="no-results-action">
+                <div class="no-results-text">
+                  <mat-icon>info_outline</mat-icon>
+                  <span>Veiculo nao encontrado</span>
+                </div>
+                <button mat-raised-button color="primary" (click)="openCadastroRapido()">
+                  <mat-icon>add</mat-icon>
+                  Cadastrar novo veiculo
+                </button>
+              </div>
+            }
           </div>
         } @else {
           <div class="veiculo-selected">

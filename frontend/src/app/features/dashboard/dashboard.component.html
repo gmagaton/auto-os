@@ -53,29 +53,32 @@
 
     <!-- Gráficos -->
     <div class="dashboard-charts">
-      <mat-card class="chart-card">
-        <mat-card-header>
-          <mat-card-title>Faturamento Mensal</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          @if (faturamentoData().length > 0) {
-            <ngx-charts-bar-vertical
-              [results]="faturamentoData()"
-              [xAxis]="true"
-              [yAxis]="true"
-              [showXAxisLabel]="false"
-              [showYAxisLabel]="false"
-              [legend]="false"
-              [scheme]="colorScheme"
-              [gradient]="true"
-              [yAxisTickFormatting]="formatCurrencyAxis"
-              [tooltipDisabled]="false">
-            </ngx-charts-bar-vertical>
-          } @else {
-            <p class="empty-chart">Sem dados de faturamento</p>
-          }
-        </mat-card-content>
-      </mat-card>
+      @if (isAdmin()) {
+        <mat-card class="chart-card">
+          <mat-card-header>
+            <mat-card-title>Faturamento Mensal</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            @if (faturamentoData().length > 0) {
+              <ngx-charts-bar-vertical
+                [results]="faturamentoData()"
+                [view]="chartView!"
+                [xAxis]="true"
+                [yAxis]="true"
+                [showXAxisLabel]="false"
+                [showYAxisLabel]="false"
+                [legend]="false"
+                [scheme]="colorScheme"
+                [gradient]="true"
+                [yAxisTickFormatting]="formatCurrencyAxis"
+                [tooltipDisabled]="false">
+              </ngx-charts-bar-vertical>
+            } @else {
+              <p class="empty-chart">Sem dados de faturamento</p>
+            }
+          </mat-card-content>
+        </mat-card>
+      }
 
       <mat-card class="chart-card">
         <mat-card-header>
@@ -85,7 +88,8 @@
           @if (servicosData().length > 0) {
             <ngx-charts-pie-chart
               [results]="servicosData()"
-              [labels]="true"
+              [view]="chartView!"
+              [labels]="!isMobile"
               [doughnut]="true"
               [legend]="true"
               [legendTitle]="''"

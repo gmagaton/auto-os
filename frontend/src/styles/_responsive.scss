@@ -519,6 +519,15 @@ html, body {
 // ===========================================
 
 @include mobile {
+  // Prevent iOS auto-zoom on input focus (requires >= 16px)
+  input,
+  select,
+  textarea,
+  .mat-mdc-input-element,
+  .mat-mdc-select-value {
+    font-size: 16px !important;
+  }
+
   .mat-mdc-form-field {
     margin-bottom: $spacing-sm !important;
   }

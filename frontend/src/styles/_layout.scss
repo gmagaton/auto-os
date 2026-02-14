@@ -48,6 +48,7 @@ mat-sidenav {
 
 mat-sidenav-content {
   background-color: $background-default;
+  overflow-x: hidden !important;
 }
 
 // Sidenav Header

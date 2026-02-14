@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NgxChartsModule, Color, ScaleType, LegendPosition } from '@swimlane/ngx-charts';
 import { DashboardService, DashboardData } from './dashboard.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,7 +20,10 @@ import { DashboardService, DashboardData } from './dashboard.service';
 })
 export class DashboardComponent implements OnInit {
   private readonly dashboardService = inject(DashboardService);
+  private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+
+  readonly isAdmin = this.authService.isAdmin;
 
   loading = signal(true);
   data = signal<DashboardData | null>(null);
@@ -35,7 +39,11 @@ export class DashboardComponent implements OnInit {
     domain: ['#3f51b5', '#e91e63', '#ff9800', '#4caf50', '#9c27b0'],
   };
 
-  legendPosition = LegendPosition.Right;
+  isMobile = window.innerWidth < 600;
+  legendPosition = this.isMobile ? LegendPosition.Below : LegendPosition.Right;
+  chartView: [number, number] | undefined = this.isMobile
+    ? [window.innerWidth - 48, 220]
+    : undefined;
 
   ngOnInit(): void {
     this.loadDashboard();
