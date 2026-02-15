@@ -6,6 +6,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NgxChartsModule, Color, ScaleType, LegendPosition } from '@swimlane/ngx-charts';
 import { DashboardService, DashboardData } from './dashboard.service';
 import { AuthService } from '../../core/services/auth.service';
+import { TenantService } from '../../core/services/tenant.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -22,6 +23,7 @@ export class DashboardComponent implements OnInit {
   private readonly dashboardService = inject(DashboardService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly tenantService = inject(TenantService);
 
   readonly isAdmin = this.authService.isAdmin;
 
@@ -86,9 +88,9 @@ export class DashboardComponent implements OnInit {
 
   navigateToOrdens(status?: string): void {
     if (status) {
-      this.router.navigate(['/ordens'], { queryParams: { status } });
+      this.router.navigate([this.tenantService.route('/ordens')], { queryParams: { status } });
     } else {
-      this.router.navigate(['/ordens']);
+      this.router.navigate([this.tenantService.route('/ordens')]);
     }
   }
 

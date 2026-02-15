@@ -11,6 +11,7 @@ import { Cliente, ClientesService, Veiculo } from './clientes.service';
 import { ClienteFormComponent, ClienteFormData } from './cliente-form.component';
 import { VeiculosService } from '../veiculos/veiculos.service';
 import { DialogService } from '../../shared/services/dialog.service';
+import { TenantService } from '../../core/services/tenant.service';
 
 @Component({
   selector: 'app-cliente-detail',
@@ -35,6 +36,7 @@ export class ClienteDetailComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly dialogService = inject(DialogService);
   private readonly snackBar = inject(MatSnackBar);
+  public readonly tenantService = inject(TenantService);
 
   cliente = signal<Cliente | null>(null);
   loading = signal(true);
@@ -88,13 +90,13 @@ export class ClienteDetailComponent implements OnInit {
   }
 
   addVeiculo(): void {
-    this.router.navigate(['/veiculos/novo'], {
+    this.router.navigate([this.tenantService.route('/veiculos/novo')], {
       queryParams: { clienteId: this.cliente()!.id },
     });
   }
 
   goToVeiculo(veiculo: Veiculo): void {
-    this.router.navigate(['/veiculos', veiculo.id, 'editar']);
+    this.router.navigate([this.tenantService.route('/veiculos'), veiculo.id, 'editar']);
   }
 
   deleteVeiculo(veiculo: Veiculo, event: Event): void {

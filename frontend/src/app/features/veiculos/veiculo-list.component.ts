@@ -12,6 +12,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { debounceTime, Subject } from 'rxjs';
 import { Veiculo, VeiculosService } from './veiculos.service';
 import { DialogService } from '../../shared/services/dialog.service';
+import { TenantService } from '../../core/services/tenant.service';
 
 @Component({
   selector: 'app-veiculo-list',
@@ -34,6 +35,7 @@ export class VeiculoListComponent implements OnInit {
   private readonly dialogService = inject(DialogService);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly tenantService = inject(TenantService);
 
   private readonly searchSubject = new Subject<string>();
 
@@ -68,11 +70,11 @@ export class VeiculoListComponent implements OnInit {
   }
 
   addVeiculo(): void {
-    this.router.navigate(['/veiculos/novo']);
+    this.router.navigate([this.tenantService.route('/veiculos/novo')]);
   }
 
   editVeiculo(veiculo: Veiculo): void {
-    this.router.navigate(['/veiculos', veiculo.id, 'editar']);
+    this.router.navigate([this.tenantService.route('/veiculos'), veiculo.id, 'editar']);
   }
 
   confirmDelete(veiculo: Veiculo): void {

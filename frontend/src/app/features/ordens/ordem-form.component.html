@@ -1,6 +1,6 @@
 <!-- Header fixo -->
 <div class="stepper-header">
-  <button mat-icon-button routerLink="/ordens" class="back-btn">
+  <button mat-icon-button [routerLink]="tenantService.route('/ordens')" class="back-btn">
     <mat-icon>arrow_back</mat-icon>
   </button>
   <div class="header-title">
@@ -233,7 +233,7 @@
           Voltar
         </button>
       } @else {
-        <button mat-stroked-button routerLink="/ordens" class="btn-cancel">
+        <button mat-stroked-button [routerLink]="tenantService.route('/ordens')" class="btn-cancel">
           Cancelar
         </button>
       }

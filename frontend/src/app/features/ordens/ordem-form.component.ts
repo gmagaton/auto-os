@@ -16,6 +16,7 @@ import { OrdensService, Ordem } from './ordens.service';
 import { VeiculosService, Veiculo } from '../veiculos/veiculos.service';
 import { ServicosService, Servico } from '../servicos/servicos.service';
 import { CadastroRapidoVeiculoDialogComponent } from './cadastro-rapido-veiculo-dialog.component';
+import { TenantService } from '../../core/services/tenant.service';
 
 interface ItemForm {
   servicoId: string;
@@ -52,6 +53,7 @@ export class OrdemFormComponent implements OnInit, OnDestroy {
   private readonly servicosService = inject(ServicosService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  public readonly tenantService = inject(TenantService);
 
   // Stepper
   currentStep = signal(0);
@@ -156,7 +158,7 @@ export class OrdemFormComponent implements OnInit, OnDestroy {
       next: (ordem) => {
         if (ordem.status !== 'AGUARDANDO') {
           this.snackBar.open('Apenas ordens aguardando aprovacao podem ser editadas', 'Fechar', { duration: 3000 });
-          this.router.navigate(['/ordens', ordem.id]);
+          this.router.navigate([this.tenantService.route('/ordens'), ordem.id]);
           return;
         }
 
@@ -178,7 +180,7 @@ export class OrdemFormComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.snackBar.open('Erro ao carregar ordem', 'Fechar', { duration: 3000 });
-        this.router.navigate(['/ordens']);
+        this.router.navigate([this.tenantService.route('/ordens')]);
       },
     });
   }
@@ -306,7 +308,7 @@ export class OrdemFormComponent implements OnInit, OnDestroy {
           'Fechar',
           { duration: 3000 }
         );
-        this.router.navigate(['/ordens', ordem.id]);
+        this.router.navigate([this.tenantService.route('/ordens'), ordem.id]);
       },
       error: (err) => {
         this.loading.set(false);

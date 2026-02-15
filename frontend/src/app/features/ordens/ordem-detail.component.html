@@ -6,14 +6,14 @@
   <!-- Header compacto -->
   <div class="detail-header-compact ordem-header">
     <div class="header-left">
-      <button mat-icon-button routerLink="/ordens">
+      <button mat-icon-button [routerLink]="tenantService.route('/ordens')">
         <mat-icon>arrow_back</mat-icon>
       </button>
       <h1>OS #{{ ordem()!.token.slice(-6).toUpperCase() }}</h1>
     </div>
     <div class="header-actions">
       @if (podeEditar()) {
-        <button mat-icon-button color="primary" [routerLink]="['/ordens', ordem()!.id, 'editar']" matTooltip="Editar">
+        <button mat-icon-button color="primary" [routerLink]="['/' + tenantService.slug() + '/ordens', ordem()!.id, 'editar']" matTooltip="Editar">
           <mat-icon>edit</mat-icon>
         </button>
       }

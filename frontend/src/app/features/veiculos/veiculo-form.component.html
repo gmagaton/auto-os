@@ -1,6 +1,6 @@
 <div class="header">
   <div class="header-left">
-    <button mat-icon-button routerLink="/veiculos">
+    <button mat-icon-button [routerLink]="tenantService.route('/veiculos')">
       <mat-icon>arrow_back</mat-icon>
     </button>
     <h1>{{ isEdit ? 'Editar Veiculo' : 'Novo Veiculo' }}</h1>
@@ -89,7 +89,7 @@
         }
 
         <div class="form-actions">
-          <button mat-button type="button" routerLink="/veiculos" [disabled]="loading()">Cancelar</button>
+          <button mat-button type="button" [routerLink]="tenantService.route('/veiculos')" [disabled]="loading()">Cancelar</button>
           <button mat-raised-button color="primary" type="submit" [disabled]="loading() || form.invalid">
             @if (loading()) {
               <mat-spinner diameter="20"></mat-spinner>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../core/services/auth.service';
+import { TenantService } from '../../core/services/tenant.service';
 
 @Component({
   selector: 'app-login',
@@ -27,13 +28,18 @@ export class LoginComponent {
   loading = false;
   error = '';
 
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-  ) {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private tenantService = inject(TenantService);
+
+  constructor() {
     // Redirecionar se ja logado
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/dashboard']);
+      if (this.authService.isSuperAdmin()) {
+        this.router.navigate(['/admin']);
+      } else {
+        this.router.navigate([this.tenantService.route('/dashboard')]);
+      }
     }
   }
 
@@ -43,7 +49,11 @@ export class LoginComponent {
 
     this.authService.login(this.email, this.senha).subscribe({
       next: () => {
-        this.router.navigate(['/dashboard']);
+        if (this.authService.isSuperAdmin()) {
+          this.router.navigate(['/admin']);
+        } else {
+          this.router.navigate([this.tenantService.route('/dashboard')]);
+        }
       },
       error: (err) => {
         this.loading = false;

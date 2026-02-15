@@ -21,6 +21,7 @@ import { Ordem, OrdensService, StatusOS, TipoFoto, Foto } from './ordens.service
 import { ChecklistPreencherComponent } from './checklist-preencher.component';
 import { DialogService } from '../../shared/services/dialog.service';
 import { environment } from '../../../environments/environment';
+import { TenantService } from '../../core/services/tenant.service';
 
 @Component({
   selector: 'app-ordem-detail',
@@ -55,6 +56,7 @@ export class OrdemDetailComponent implements OnInit {
   private readonly dialogService = inject(DialogService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly clipboard = inject(Clipboard);
+  public readonly tenantService = inject(TenantService);
 
   ordem = signal<Ordem | null>(null);
   loading = signal(true);

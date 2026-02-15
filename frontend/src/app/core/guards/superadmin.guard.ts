@@ -1,17 +1,15 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { TenantService } from '../services/tenant.service';
 
-export const adminGuard: CanActivateFn = () => {
+export const superAdminGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
-  const tenantService = inject(TenantService);
   const router = inject(Router);
 
-  if (authService.isAdmin()) {
+  if (authService.isSuperAdmin()) {
     return true;
   }
 
-  router.navigate([tenantService.route('/dashboard')]);
+  router.navigate(['/login']);
   return false;
 };
