@@ -1,0 +1,122 @@
+@if (loading()) {
+  <div class="loading">
+    <mat-spinner diameter="40" />
+  </div>
+} @else if (empresa(); as e) {
+  <!-- Header compacto -->
+  <div class="detail-header-compact">
+    <div class="header-left">
+      <button mat-icon-button routerLink="/admin/empresas">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1>{{ e.nome }}</h1>
+    </div>
+    <div class="header-actions">
+      <button mat-icon-button (click)="router.navigate(['/admin/empresas', e.id, 'editar'])">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button color="primary" (click)="acessar()">
+        <mat-icon>open_in_new</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="detail-card">
+    <div class="info-section">
+      <div class="status-row">
+        <span class="status-badge" [class]="'status-' + e.status.toLowerCase()">{{ e.status }}</span>
+        @if (e.status === 'ATIVA') {
+          <button mat-stroked-button color="warn" (click)="alterarStatus('SUSPENSA')">
+            <mat-icon>pause</mat-icon> Suspender
+          </button>
+        }
+        @if (e.status === 'SUSPENSA') {
+          <button mat-stroked-button color="primary" (click)="alterarStatus('ATIVA')">
+            <mat-icon>play_arrow</mat-icon> Reativar
+          </button>
+          <button mat-stroked-button color="warn" (click)="alterarStatus('CANCELADA')">
+            <mat-icon>cancel</mat-icon> Cancelar
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Informacoes -->
+  <div class="detail-card">
+    <div class="info-section">
+      <h3><mat-icon>business</mat-icon> Informacoes</h3>
+      <div class="info-list">
+        <div class="info-row">
+          <span class="label">Slug</span>
+          <span class="value">{{ e.slug }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Email</span>
+          <span class="value">{{ e.email || '-' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Telefone</span>
+          <span class="value">{{ e.telefone || '-' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Endereco</span>
+          <span class="value">{{ e.endereco || '-' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Plano</span>
+          <span class="value">{{ e.plano || '-' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Vencimento</span>
+          <span class="value">{{ e.dataVencimento ? (e.dataVencimento | date:'dd/MM/yyyy') : '-' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Criada em</span>
+          <span class="value">{{ e.criadoEm | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resumo -->
+  <div class="detail-card">
+    <div class="info-section">
+      <h3><mat-icon>bar_chart</mat-icon> Resumo</h3>
+      <div class="info-list">
+        <div class="info-row">
+          <span class="label">Usuarios</span>
+          <span class="value">{{ e._count.usuarios }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Clientes</span>
+          <span class="value">{{ e._count.clientes }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Veiculos</span>
+          <span class="value">{{ e._count.veiculos }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Ordens</span>
+          <span class="value">{{ e._count.ordens }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Servicos</span>
+          <span class="value">{{ e._count.servicos }}</span>
+        </div>
+        @if (stats(); as s) {
+          <div class="info-row">
+            <span class="label">Faturamento</span>
+            <span class="value"><strong>{{ s.faturamento | currency:'BRL':'symbol':'1.0-0' }}</strong></span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="empty-message">
+    <mat-icon>error_outline</mat-icon>
+    <h3>Empresa nao encontrada</h3>
+  </div>
+}

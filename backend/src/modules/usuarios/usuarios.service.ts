@@ -19,7 +19,7 @@ export class UsuariosService {
 
   async findAll() {
     return this.prisma.usuario.findMany({
-      where: { empresaId: this.tenant.empresaId },
+      where: { empresaId: this.tenant.empresaId, papel: { not: 'SUPERADMIN' } },
       select: {
         id: true,
         nome: true,
@@ -34,7 +34,7 @@ export class UsuariosService {
 
   async findOne(id: string) {
     const usuario = await this.prisma.usuario.findFirst({
-      where: { id, empresaId: this.tenant.empresaId },
+      where: { id, empresaId: this.tenant.empresaId, papel: { not: 'SUPERADMIN' } },
       select: {
         id: true,
         nome: true,

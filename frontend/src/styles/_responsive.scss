@@ -598,3 +598,26 @@ html, body {
     }
   }
 }
+
+// ===========================================
+// ADMIN PAGES (Mobile)
+// ===========================================
+
+@include mobile {
+  .detail-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: $spacing-sm !important;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}

@@ -8,19 +8,30 @@ export const tenantGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  if (!authService.isLoggedIn()) {
+  const slugFromUrl = route.paramMap.get('slug');
+  if (!slugFromUrl) {
     router.navigate(['/login']);
     return false;
   }
 
-  const slugFromUrl = route.paramMap.get('slug');
-  const slugFromTenant = tenantService.slug();
-
-  if (slugFromUrl && slugFromUrl !== slugFromTenant) {
-    // Slug mismatch - redirect to the correct slug
-    router.navigate([tenantService.route('/dashboard')]);
-    return false;
+  // 1) Try to activate the session for this slug (regular user logged into this empresa)
+  if (authService.activateSession(slugFromUrl)) {
+    return true;
   }
 
-  return true;
+  // 2) If no direct session, check if there's a SUPERADMIN session that can access any empresa
+  const adminSession = authService.getAdminSession();
+  if (adminSession) {
+    authService.activateSession('__admin__');
+    // Update tenant context to the target empresa
+    tenantService.setEmpresa({
+      ...adminSession.empresa,
+      slug: slugFromUrl,
+    });
+    return true;
+  }
+
+  // 3) No valid session for this slug
+  router.navigate(['/login']);
+  return false;
 };

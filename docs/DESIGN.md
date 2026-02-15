@@ -1,59 +1,63 @@
 # Auto OS - Design do Sistema
 
-**Objetivo:** Sistema de gestão para oficinas de funilaria com orçamentos, agenda e acompanhamento de serviços
+**Objetivo:** Sistema SaaS multi-tenant de gestao para oficinas de funilaria com orcamentos, agenda e acompanhamento de servicos
 
 ---
 
-## Visão Geral
+## Visao Geral
 
-Sistema web responsivo (PC e celular) para gestão de oficinas de funilaria. Permite cadastro de clientes, veículos, serviços, emissão de orçamentos, agendamento e acompanhamento do serviço pelo cliente através de um portal público.
+Sistema web responsivo (PC e celular) para gestao de oficinas de funilaria. Permite cadastro de clientes, veiculos, servicos, emissao de orcamentos, agendamento e acompanhamento do servico pelo cliente atraves de um portal publico.
 
-### Contexto
-
-- Internet estável na oficina
-- 3-5 usuários simultâneos
-- Possível evolução futura para SaaS multi-tenant
+Opera no modelo **SaaS multi-tenant**: um SUPERADMIN gerencia empresas (oficinas) que contratam o sistema, cada uma com seus dados isolados.
 
 ### Arquitetura Geral
 
 ```
-┌─────────────────────────────────────────────────┐
-│              Next.js Application                │
-│  ┌─────────────────┐  ┌─────────────────────┐  │
-│  │  App (Interno)  │  │  Portal do Cliente  │  │
-│  │  /app/*         │  │  /cliente/[token]   │  │
-│  └─────────────────┘  └─────────────────────┘  │
-│  ┌─────────────────────────────────────────┐   │
-│  │           API Routes (/api/*)           │   │
-│  └─────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────┘
-                        │
-        ┌───────────────┼───────────────┐
-        ▼               ▼               ▼
-   PostgreSQL      Cloudinary       Email
-   (dados)         (fotos)          (notificações)
+                       ┌──────────────────────────────────────────────────┐
+                       │             Angular SPA (Frontend)              │
+                       │  ┌───────────┐ ┌──────────────┐ ┌───────────┐  │
+                       │  │  /:slug/* │ │ /admin/*     │ │ /portal/* │  │
+                       │  │  App      │ │ SuperAdmin   │ │ Publico   │  │
+                       │  │  Tenant   │ │ Panel        │ │ Cliente   │  │
+                       │  └───────────┘ └──────────────┘ └───────────┘  │
+                       └───────────────────────┬────────────────────────┘
+                                               │
+                       ┌───────────────────────┼────────────────────────┐
+                       │              NestJS API (Backend)              │
+                       │  ┌──────────┐ ┌────────────┐ ┌────────────┐   │
+                       │  │ Tenant   │ │ Auth/JWT   │ │ Empresas   │   │
+                       │  │ Guard    │ │ Guard      │ │ CRUD       │   │
+                       │  └──────────┘ └────────────┘ └────────────┘   │
+                       └───────────────────────┬────────────────────────┘
+                                               │
+                       ┌───────────┬───────────┼───────────┐
+                       ▼           ▼           ▼           ▼
+                  PostgreSQL   Cloudinary    Email       Upload
+                  (dados)      (fotos)     (SMTP)      (local)
 ```
 
-### Dois Mundos
+### Tres Mundos
 
-1. **App Interno** (`/app/*`) - Funcionários trabalham com login obrigatório
-2. **Portal do Cliente** (`/cliente/[token]`) - Cliente acompanha via link único
+1. **App Tenant** (`/:slug/*`) - Funcionarios de cada oficina trabalham com login obrigatorio
+2. **Painel SuperAdmin** (`/admin/*`) - Gerenciamento de empresas pelo SUPERADMIN
+3. **Portal do Cliente** (`/portal/:token`) - Cliente acompanha via link unico (sem login)
 
 ---
 
-## Stack Técnico
+## Stack Tecnico
 
 | Camada | Tecnologia | Justificativa |
 |--------|------------|---------------|
-| **Frontend** | Angular 17+ (standalone) | Framework robusto, TypeScript nativo, boa DX |
+| **Frontend** | Angular 19 (standalone) | Framework robusto, TypeScript nativo, signals |
 | **UI** | Angular Material | Componentes oficiais, Material Design, responsivo |
 | **Backend** | NestJS | Arquitetura modular, similar ao Angular, TypeScript |
 | **Banco** | PostgreSQL | Robusto, relacional, bom para dados estruturados |
-| **ORM** | Prisma | Type-safe, migrations fáceis, boa DX |
-| **Autenticação** | JWT + Passport | Padrão de mercado, stateless, escalável |
-| **Upload de Fotos** | Cloudinary | Otimização automática, transformações, CDN |
-| **Validação** | class-validator (NestJS) + Angular Forms | Validação em ambas as pontas |
-| **Deploy** | VPS/Docker ou Railway | Flexível, controle total |
+| **ORM** | Prisma | Type-safe, migrations faceis, boa DX |
+| **Autenticacao** | JWT + Passport | Padrao de mercado, stateless, escalavel |
+| **Upload de Fotos** | Upload local + Cloudinary | Upload local dev, Cloudinary producao |
+| **Validacao** | class-validator (NestJS) + Angular Forms | Validacao em ambas as pontas |
+| **PDF** | pdfmake | Geracao de PDF de orcamentos |
+| **Deploy** | VPS/Docker ou Vercel+Render | Flexivel, controle total |
 
 ### Estrutura de Pastas
 
@@ -63,12 +67,18 @@ Sistema web responsivo (PC e celular) para gestão de oficinas de funilaria. Per
 │   ├── /src
 │   │   ├── /modules
 │   │   │   ├── /auth           ← Login, JWT, guards
+│   │   │   ├── /tenant         ← TenantService, TenantGuard (multi-tenant)
+│   │   │   ├── /empresas       ← CRUD empresas (SUPERADMIN)
 │   │   │   ├── /usuarios
 │   │   │   ├── /clientes
 │   │   │   ├── /veiculos
 │   │   │   ├── /fabricantes
 │   │   │   ├── /servicos
 │   │   │   ├── /ordens
+│   │   │   ├── /checklist
+│   │   │   ├── /dashboard
+│   │   │   ├── /relatorios
+│   │   │   ├── /email
 │   │   │   └── /upload
 │   │   ├── /prisma
 │   │   │   ├── schema.prisma
@@ -79,16 +89,22 @@ Sistema web responsivo (PC e celular) para gestão de oficinas de funilaria. Per
 ├── /frontend                   ← Angular SPA
 │   ├── /src
 │   │   ├── /app
-│   │   │   ├── /core           ← Guards, interceptors, auth
-│   │   │   ├── /shared         ← Componentes reutilizáveis
-│   │   │   └── /features       ← Módulos por funcionalidade
-│   │   │       ├── /auth
+│   │   │   ├── /core           ← Guards, interceptors, auth, tenant
+│   │   │   ├── /shared         ← Componentes reutilizaveis
+│   │   │   ├── /layout         ← Sidenav, header
+│   │   │   └── /features       ← Modulos por funcionalidade
+│   │   │       ├── /login
+│   │   │       ├── /landing
+│   │   │       ├── /admin      ← Painel SUPERADMIN
+│   │   │       ├── /dashboard
 │   │   │       ├── /ordens
 │   │   │       ├── /clientes
 │   │   │       ├── /veiculos
 │   │   │       ├── /servicos
 │   │   │       ├── /fabricantes
 │   │   │       ├── /usuarios
+│   │   │       ├── /checklist
+│   │   │       ├── /agenda
 │   │   │       └── /portal     ← Portal do cliente
 │   │   └── /environments
 │   └── package.json
@@ -98,15 +114,15 @@ Sistema web responsivo (PC e celular) para gestão de oficinas de funilaria. Per
     └── DEPLOY.md
 ```
 
-### Convenções de Código Angular
+### Convencoes de Codigo Angular
 
-**Separação de Responsabilidades:**
+**Separacao de Responsabilidades:**
 
-Componentes Angular devem usar arquivos separados para template e lógica:
+Componentes Angular devem usar arquivos separados para template e logica:
 
 ```
 /feature-name/
-├── component-name.component.ts      ← Lógica (TypeScript)
+├── component-name.component.ts      ← Logica (TypeScript)
 └── component-name.component.html    ← Template (HTML)
 ```
 
@@ -120,20 +136,20 @@ Componentes Angular devem usar arquivos separados para template e lógica:
   templateUrl: './component-name.component.html',
 })
 export class ComponentNameComponent {
-  // Lógica do componente
+  // Logica do componente
 }
 ```
 
 **Regras:**
 - **Nunca** usar `template` inline - sempre usar `templateUrl`
 - **Nunca** usar estilos por componente - usar estilos globais
-- Exceção: componentes muito simples (ex: AppComponent com apenas `<router-outlet />`)
+- Excecao: componentes muito simples (ex: AppComponent com apenas `<router-outlet />`)
 - Nomes de arquivos em kebab-case
-- Componentes standalone por padrão (Angular 17+)
+- Componentes standalone por padrao (Angular 19)
 
 ### Estilos CSS Globais
 
-**Filosofia:** Estilos unificados e reutilizáveis em toda a aplicação.
+**Filosofia:** Estilos unificados e reutilizaveis em toda a aplicacao.
 
 **Estrutura de Arquivos:**
 
@@ -141,38 +157,121 @@ export class ComponentNameComponent {
 /frontend/src/
 ├── styles.scss                    ← Ponto de entrada (imports)
 └── styles/
-    ├── _variables.scss            ← Variáveis (cores, espaçamentos, breakpoints)
-    ├── _mixins.scss               ← Mixins reutilizáveis
+    ├── _variables.scss            ← Variaveis (cores, espacamentos, breakpoints)
+    ├── _mixins.scss               ← Mixins reutilizaveis
     ├── _base.scss                 ← Reset, tipografia, elementos base
     ├── _layout.scss               ← Grid, containers, flexbox utilities
     ├── _components.scss           ← Estilos de componentes UI (cards, forms, tables)
-    └── _utilities.scss            ← Classes utilitárias (spacing, colors, display)
+    └── _utilities.scss            ← Classes utilitarias (spacing, colors, display)
 ```
 
-**Classes Utilitárias Padrão:**
-
-| Classe | Descrição |
-|--------|-----------|
-| `.page-header` | Cabeçalho de página com título e ações |
-| `.page-content` | Conteúdo principal da página |
-| `.form-container` | Container para formulários |
-| `.form-grid` | Grid para campos de formulário |
-| `.full-width` | Largura 100% |
-| `.loading` | Container centralizado para spinner |
-| `.empty` | Mensagem de lista vazia |
-| `.clickable-row` | Linha clicável em tabelas |
-| `.info-grid` | Grid para exibição de informações |
-| `.info-item` | Item de informação (label + valor) |
-| `.text-right` | Alinhamento à direita |
-| `.text-center` | Alinhamento centralizado |
-| `.mt-*`, `.mb-*`, `.p-*` | Margins e paddings |
-
 **Regras de Estilos:**
-- **Componentes NÃO devem ter** `styleUrl` ou `styles`
+- Componentes NAO devem ter `styleUrl` ou `styles`
 - Usar classes CSS globais definidas em `styles/`
-- Seguir convenção BEM para novos seletores quando necessário
-- Variáveis SCSS para cores, tamanhos e breakpoints
+- Seguir convencao BEM para novos seletores quando necessario
+- Variaveis SCSS para cores, tamanhos e breakpoints
 - Mobile-first para responsividade
+
+---
+
+## Arquitetura Multi-Tenant
+
+### Estrategia
+
+**Schema unico com coluna `empresaId`** em todas as tabelas tenant-scoped. Cada empresa (oficina) tem seus dados isolados no mesmo banco de dados.
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                     PostgreSQL (Schema Unico)                  │
+│                                                                │
+│  ┌──────────┐                                                  │
+│  │ Empresa  │──┬─────────────────────────────────────────┐     │
+│  │(tenant)  │  │ empresaId FK em todas tabelas scoped    │     │
+│  └──────────┘  │                                         │     │
+│                ▼                                         ▼     │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌────────────┐        │
+│  │ Usuario  │ │ Cliente  │ │ Veiculo  │ │OrdemServico│ ...    │
+│  └──────────┘ └──────────┘ └──────────┘ └────────────┘        │
+│                                                                │
+│  Dados compartilhados (SEM empresaId):                         │
+│  ┌────────────┐ ┌──────────┐ ┌──────────────┐ ┌────────────┐  │
+│  │ Fabricante │ │  Modelo  │ │ItemChecklist │ │ItemOrcamento│ │
+│  └────────────┘ └──────────┘ └──────────────┘ └────────────┘  │
+└────────────────────────────────────────────────────────────────┘
+```
+
+### Identificacao do Tenant
+
+- **URL com slug**: `/:slug/dashboard`, `/:slug/ordens`, etc.
+- **JWT**: Contem `empresaId` no payload, extraido no login
+- **Backend**: `TenantService` (request-scoped) extrai `empresaId` do request.user
+- **Frontend**: `TenantService` armazena empresa no localStorage, expoe `slug()` signal
+
+### Tabelas Tenant-Scoped (com `empresaId`)
+
+| Tabela | Descricao |
+|--------|-----------|
+| `Usuario` | Usuarios do sistema (unique composto: `[email, empresaId]`) |
+| `Cliente` | Clientes da oficina |
+| `Veiculo` | Veiculos dos clientes |
+| `OrdemServico` | Ordens de servico |
+| `Servico` | Catalogo de servicos da oficina |
+| `Foto` | Fotos de veiculos |
+| `ChecklistPreenchido` | Checklist preenchido por ordem |
+| `HistoricoStatus` | Historico de mudancas de status |
+
+### Tabelas Compartilhadas (sem `empresaId`)
+
+| Tabela | Descricao |
+|--------|-----------|
+| `Fabricante` | Fabricantes de veiculos (compartilhado) |
+| `Modelo` | Modelos de veiculos (compartilhado) |
+| `ItemChecklist` | Itens de configuracao do checklist (compartilhado) |
+| `ItemOrcamento` | Itens do orcamento (vinculado a OrdemServico que ja tem empresaId) |
+
+### Fluxo de Autenticacao Multi-Tenant
+
+```
+Login (email + senha)
+     │
+     ▼
+┌─────────────────────────────────┐
+│ AuthService.login()             │
+│ - findFirst({ email })          │
+│ - Valida senha                  │
+│ - Valida empresa.status         │
+│ - Retorna JWT com empresaId     │
+│ - Retorna empresa { slug, nome }│
+└──────────────┬──────────────────┘
+               │
+               ▼
+┌─────────────────────────────────┐
+│ Frontend: AuthService           │
+│ - Armazena token                │
+│ - TenantService.setEmpresa()   │
+│ - Redireciona:                  │
+│   SUPERADMIN → /admin           │
+│   Outros → /:slug/dashboard     │
+└──────────────┬──────────────────┘
+               │
+               ▼
+┌─────────────────────────────────┐
+│ Cada request API:               │
+│ JwtAuthGuard → extrai user      │
+│ TenantGuard → valida empresa    │
+│   - Status ATIVA?               │
+│   - Plano vencido?              │
+│   - SUPERADMIN bypass?          │
+│ TenantService → empresaId       │
+│ Service → where: { empresaId }  │
+└─────────────────────────────────┘
+```
+
+### Caso Especial: Portal Publico
+
+O portal do cliente (`/portal/:token`) **nao tem autenticacao**. Para queries scoped:
+- O `empresaId` e extraido diretamente do registro da `OrdemServico` associada ao token
+- **Nao usa** `TenantService` (que requer JWT)
 
 ---
 
@@ -181,51 +280,93 @@ export class ComponentNameComponent {
 ### Diagrama de Entidades
 
 ```
-┌─────────────┐     ┌─────────────┐     ┌─────────────────┐
-│   Cliente   │────<│   Veículo   │────<│  OrdemServico   │
-└─────────────┘     └─────────────┘     └─────────────────┘
-                          │                    │
-                    ┌─────┴─────┐    ┌─────────┼─────────┐
-                    ▼           │    ▼         ▼         ▼
-              ┌──────────┐      │  ┌─────┐  ┌─────┐  ┌─────────┐
-              │  Modelo  │      │  │Item │  │Foto │  │Checklist│
-              └──────────┘      │  └─────┘  └─────┘  └─────────┘
-                    │           │      │
-                    ▼           │      ▼
-              ┌────────────┐    │  ┌─────────┐
-              │ Fabricante │    │  │ Serviço │
-              └────────────┘    │  └─────────┘
-                                │
-                          ┌─────┴─────┐
-                          ▼           ▼
-                    ┌──────────┐ ┌────────────┐
-                    │  Modelo  │ │ItemChecklist│
-                    └──────────┘ └────────────┘
+┌──────────┐
+│ Empresa  │ (tenant root)
+└────┬─────┘
+     │ empresaId
+     ├───────────────┬───────────────┬───────────────┬──────────────┐
+     ▼               ▼               ▼               ▼              ▼
+┌──────────┐  ┌──────────┐  ┌──────────────┐  ┌──────────┐  ┌──────────┐
+│ Usuario  │  │ Cliente  │  │ OrdemServico │  │ Servico  │  │  Foto    │
+└──────────┘  └────┬─────┘  └──────┬───────┘  └──────────┘  └──────────┘
+                   │               │
+                   ▼               ├───────────┬──────────┐
+             ┌──────────┐         ▼           ▼          ▼
+             │ Veiculo  │   ┌──────────┐ ┌────────┐ ┌──────────────────┐
+             └──────────┘   │  Item    │ │Historico│ │Checklist         │
+                   │        │Orcamento │ │ Status │ │ Preenchido       │
+                   ▼        └──────────┘ └────────┘ └──────────────────┘
+             ┌──────────┐         │                        │
+             │  Modelo  │         ▼                        ▼
+             └──────────┘   ┌──────────┐            ┌──────────────┐
+                   │        │ Servico  │            │ ItemChecklist│
+                   ▼        └──────────┘            └──────────────┘
+             ┌────────────┐
+             │ Fabricante │
+             └────────────┘
+
+  (Fabricante, Modelo, ItemChecklist = compartilhados, sem empresaId)
 ```
 
 ### Schema Prisma
 
 ```prisma
-// prisma/schema.prisma
+// === EMPRESA (MULTI-TENANT) ===
+
+enum StatusEmpresa {
+  ATIVA
+  SUSPENSA
+  CANCELADA
+}
+
+model Empresa {
+  id              String         @id @default(cuid())
+  nome            String
+  slug            String         @unique
+  logoUrl         String?
+  telefone        String?
+  email           String?
+  endereco        String?
+  status          StatusEmpresa  @default(ATIVA)
+  dataVencimento  DateTime?
+  plano           String?
+  criadoEm        DateTime       @default(now())
+  atualizadoEm    DateTime       @updatedAt
+
+  usuarios              Usuario[]
+  clientes              Cliente[]
+  veiculos              Veiculo[]
+  ordens                OrdemServico[]
+  servicos              Servico[]
+  fotos                 Foto[]
+  checklistsPreenchidos ChecklistPreenchido[]
+  historicos            HistoricoStatus[]
+}
+
+// === AUTENTICACAO ===
 
 model Usuario {
   id        String   @id @default(cuid())
   nome      String
-  email     String   @unique
+  email     String
   senha     String
   papel     Papel    @default(ATENDENTE)
   ativo     Boolean  @default(true)
   criadoEm  DateTime @default(now())
 
-  ordens     OrdemServico[]
-  checklists ChecklistPreenchido[]
-  historicos HistoricoStatus[]
+  empresaId String
+  empresa   Empresa  @relation(fields: [empresaId], references: [id])
+
+  @@unique([email, empresaId])
 }
 
 enum Papel {
+  SUPERADMIN
   ADMIN
   ATENDENTE
 }
+
+// === CLIENTES E VEICULOS ===
 
 model Cliente {
   id        String   @id @default(cuid())
@@ -234,6 +375,9 @@ model Cliente {
   email     String?
   documento String?
   criadoEm  DateTime @default(now())
+
+  empresaId String
+  empresa   Empresa  @relation(fields: [empresaId], references: [id])
 
   veiculos  Veiculo[]
 }
@@ -248,10 +392,10 @@ model Fabricante {
 }
 
 model Modelo {
-  id           String   @id @default(cuid())
+  id           String     @id @default(cuid())
   nome         String
-  ativo        Boolean  @default(true)
-  criadoEm     DateTime @default(now())
+  ativo        Boolean    @default(true)
+  criadoEm     DateTime   @default(now())
 
   fabricanteId String
   fabricante   Fabricante @relation(fields: [fabricanteId], references: [id])
@@ -269,13 +413,13 @@ model Veiculo {
   criadoEm  DateTime @default(now())
 
   modeloId  String
-  modelo    Modelo   @relation(fields: [modeloId], references: [id])
-
   clienteId String
-  cliente   Cliente  @relation(fields: [clienteId], references: [id])
+  empresaId String
 
   ordens    OrdemServico[]
 }
+
+// === SERVICOS ===
 
 model Servico {
   id        String      @id @default(cuid())
@@ -285,6 +429,8 @@ model Servico {
   ativo     Boolean     @default(true)
   criadoEm  DateTime    @default(now())
 
+  empresaId String
+
   itens     ItemOrcamento[]
 }
 
@@ -292,6 +438,8 @@ enum TipoServico {
   SERVICO
   ADICIONAL
 }
+
+// === ORDENS DE SERVICO ===
 
 model OrdemServico {
   id           String    @id @default(cuid())
@@ -304,10 +452,8 @@ model OrdemServico {
   atualizadoEm DateTime  @updatedAt
 
   veiculoId    String
-  veiculo      Veiculo   @relation(fields: [veiculoId], references: [id])
-
   usuarioId    String
-  usuario      Usuario   @relation(fields: [usuarioId], references: [id])
+  empresaId    String
 
   itens        ItemOrcamento[]
   fotos        Foto[]
@@ -330,10 +476,8 @@ model HistoricoStatus {
   criadoEm   DateTime  @default(now())
 
   ordemId    String
-  ordem      OrdemServico @relation(fields: [ordemId], references: [id], onDelete: Cascade)
-
   usuarioId  String?
-  usuario    Usuario? @relation(fields: [usuarioId], references: [id])
+  empresaId  String
 }
 
 model ItemOrcamento {
@@ -341,10 +485,7 @@ model ItemOrcamento {
   valor     Decimal      @db.Decimal(10, 2)
 
   ordemId   String
-  ordem     OrdemServico @relation(fields: [ordemId], references: [id], onDelete: Cascade)
-
   servicoId String
-  servico   Servico      @relation(fields: [servicoId], references: [id])
 }
 
 model Foto {
@@ -354,7 +495,7 @@ model Foto {
   criadoEm  DateTime     @default(now())
 
   ordemId   String
-  ordem     OrdemServico @relation(fields: [ordemId], references: [id], onDelete: Cascade)
+  empresaId String
 }
 
 enum TipoFoto {
@@ -362,6 +503,8 @@ enum TipoFoto {
   PROGRESSO
   FINAL
 }
+
+// === CHECKLIST ===
 
 model ItemChecklist {
   id        String   @id @default(cuid())
@@ -381,13 +524,9 @@ model ChecklistPreenchido {
   criadoEm   DateTime        @default(now())
 
   ordemId    String
-  ordem      OrdemServico    @relation(fields: [ordemId], references: [id], onDelete: Cascade)
-
   itemId     String
-  item       ItemChecklist   @relation(fields: [itemId], references: [id])
-
   usuarioId  String
-  usuario    Usuario         @relation(fields: [usuarioId], references: [id])
+  empresaId  String
 
   @@unique([ordemId, itemId])
 }
@@ -401,6 +540,187 @@ enum StatusChecklist {
 
 ---
 
+## Permissoes
+
+### Papeis
+
+| Papel | Descricao |
+|-------|-----------|
+| **SUPERADMIN** | Gerencia empresas, acesso total ao sistema, bypassa guards |
+| **ADMIN** | Acesso total dentro da sua empresa, gerencia usuarios e configuracoes |
+| **ATENDENTE** | Operacao do dia-a-dia dentro da sua empresa |
+
+### Matriz
+
+| Funcionalidade | SUPERADMIN | ADMIN | ATENDENTE |
+|----------------|------------|-------|-----------|
+| Gerenciar empresas | ✓ | - | - |
+| Ordens de Servico (CRUD) | ✓ | ✓ | ✓ |
+| Clientes (CRUD) | ✓ | ✓ | ✓ |
+| Veiculos (CRUD) | ✓ | ✓ | ✓ |
+| Agenda | ✓ | ✓ | ✓ |
+| Fotos | ✓ | ✓ | ✓ |
+| Checklist (preencher) | ✓ | ✓ | ✓ |
+| Servicos (CRUD) | ✓ | ✓ | So visualiza |
+| Fabricantes/Modelos (CRUD) | ✓ | ✓ | So visualiza |
+| Itens do Checklist (config) | ✓ | ✓ | - |
+| Usuarios (CRUD) | ✓ | ✓ | - |
+
+### Regras
+
+- SUPERADMIN bypassa qualquer role check e TenantGuard
+- ADMIN nao pode remover a si mesmo
+- ATENDENTE ve todas as OS da sua empresa
+- Email do usuario e unique por empresa (`@@unique([email, empresaId])`)
+
+---
+
+## Infraestrutura Multi-Tenant (Backend)
+
+### TenantModule (Global)
+
+```
+backend/src/modules/tenant/
+├── tenant.module.ts      ← Global module
+├── tenant.service.ts     ← Request-scoped, expoe empresaId
+└── tenant.guard.ts       ← Valida empresa ativa e plano
+```
+
+**TenantService** (request-scoped):
+- Extrai `empresaId` do `request.user` (populado pelo JwtAuthGuard)
+- Lanca `ForbiddenException` se usuario nao vinculado a empresa
+- Expoe `isSuperAdmin` getter
+
+**TenantGuard**:
+1. SUPERADMIN → bypass (return true)
+2. Verifica se usuario tem `empresaId`
+3. Busca empresa no banco
+4. Valida `status === 'ATIVA'`
+5. Valida `dataVencimento` (se definida, nao pode estar vencida)
+
+### Padrao de Scoping nos Services
+
+Todos os services tenant-scoped injetam `TenantService` e:
+
+```typescript
+// findMany: filtra por empresaId
+findAll() {
+  return this.prisma.model.findMany({
+    where: { empresaId: this.tenant.empresaId },
+  });
+}
+
+// findOne: usa findFirst com empresaId (nao findUnique por id)
+findOne(id: string) {
+  return this.prisma.model.findFirst({
+    where: { id, empresaId: this.tenant.empresaId },
+  });
+}
+
+// create: inclui empresaId
+create(dto) {
+  return this.prisma.model.create({
+    data: { ...dto, empresaId: this.tenant.empresaId },
+  });
+}
+```
+
+### EmpresasModule (SUPERADMIN)
+
+```
+backend/src/modules/empresas/
+├── empresas.module.ts
+├── empresas.service.ts
+├── empresas.controller.ts
+└── dto/
+    ├── create-empresa.dto.ts
+    └── update-empresa.dto.ts
+```
+
+**Endpoints** (todos `@Roles('SUPERADMIN')`):
+
+| Metodo | Rota | Descricao |
+|--------|------|-----------|
+| GET | `/api/empresas` | Lista empresas (com busca) |
+| GET | `/api/empresas/:id` | Detalhe da empresa |
+| GET | `/api/empresas/:id/stats` | Estatisticas (usuarios, ordens, faturamento) |
+| POST | `/api/empresas` | Criar empresa (slug auto-gerado) |
+| PUT | `/api/empresas/:id` | Atualizar empresa |
+| PATCH | `/api/empresas/:id/status` | Alterar status (ATIVA/SUSPENSA/CANCELADA) |
+| DELETE | `/api/empresas/:id` | Remover empresa (se sem dados) |
+
+### Guards Aplicados
+
+| Controller | Guards |
+|------------|--------|
+| AuthController | Nenhum (publico) |
+| PortalController | Nenhum (publico, acesso por token) |
+| FabricantesController | JwtAuthGuard, RolesGuard |
+| ModelosController | JwtAuthGuard, RolesGuard |
+| EmpresasController | JwtAuthGuard, RolesGuard (`SUPERADMIN`) |
+| ClientesController | JwtAuthGuard, RolesGuard, **TenantGuard** |
+| VeiculosController | JwtAuthGuard, RolesGuard, **TenantGuard** |
+| ServicosController | JwtAuthGuard, RolesGuard, **TenantGuard** |
+| OrdensController | JwtAuthGuard, RolesGuard, **TenantGuard** |
+| ChecklistController | JwtAuthGuard, RolesGuard, **TenantGuard** |
+| DashboardController | JwtAuthGuard, RolesGuard, **TenantGuard** |
+| UsuariosController | JwtAuthGuard, RolesGuard, **TenantGuard** |
+
+---
+
+## Rotas do Frontend
+
+### Estrutura de Rotas
+
+```
+/                          → Landing page (publico)
+/login                     → Login (publico)
+/portal/:token             → Portal do cliente (publico)
+/admin                     → Painel SUPERADMIN (authGuard + superAdminGuard)
+  /admin/empresas          → Lista empresas
+  /admin/empresas/nova     → Criar empresa
+  /admin/empresas/:id      → Detalhe empresa
+  /admin/empresas/:id/editar → Editar empresa
+/:slug                     → App tenant (tenantGuard)
+  /:slug/dashboard         → Dashboard
+  /:slug/ordens            → Ordens de servico
+  /:slug/clientes          → Clientes
+  /:slug/veiculos          → Veiculos
+  /:slug/servicos          → Servicos
+  /:slug/fabricantes       → Fabricantes e modelos
+  /:slug/agenda            → Agenda
+  /:slug/checklist         → Config checklist (adminGuard)
+  /:slug/usuarios          → Usuarios (adminGuard)
+```
+
+### Guards do Frontend
+
+| Guard | Funcao |
+|-------|--------|
+| `authGuard` | Verifica token JWT valido |
+| `adminGuard` | Verifica papel ADMIN ou SUPERADMIN |
+| `superAdminGuard` | Verifica papel SUPERADMIN |
+| `tenantGuard` | Valida slug da URL vs empresa armazenada |
+
+### TenantService (Frontend)
+
+- Armazena empresa (`id`, `slug`, `nome`, `logoUrl`) no localStorage
+- Expoe `slug()` como computed signal
+- Expoe `empresa()` como readonly signal
+- Helper `route(path)` que prefixa com `/${slug}/`
+- Populado no login, limpo no logout
+
+### Navegacao
+
+Todos os componentes usam `TenantService.route()` ou interpolacao com slug para navegacao:
+```typescript
+this.router.navigate([this.tenantService.route('/ordens')]);
+// ou
+routerLink="/{{ tenantService.slug() }}/ordens"
+```
+
+---
+
 ## Fluxo Principal
 
 ```
@@ -408,18 +728,18 @@ Cliente chega
      │
      ▼
 ┌─────────────────────────────────────────────┐
-│ 1. NOVO ORÇAMENTO                           │
+│ 1. NOVO ORCAMENTO                           │
 │    - Busca/cadastra cliente                 │
-│    - Busca/cadastra veículo                 │
-│    - Tira fotos do veículo (entrada)        │
-│    - Seleciona serviços + adicionais        │
-│    - Gera orçamento com valor total         │
+│    - Busca/cadastra veiculo                 │
+│    - Tira fotos do veiculo (entrada)        │
+│    - Seleciona servicos + adicionais        │
+│    - Gera orcamento com valor total         │
 └─────────────────────────────────────────────┘
      │
      ▼
 ┌─────────────────────────────────────────────┐
 │ 2. ENVIO AO CLIENTE                         │
-│    - Sistema gera link único do portal      │
+│    - Sistema gera link unico do portal      │
 │    - Atendente envia link (WhatsApp manual) │
 │    - Cliente visualiza e aprova no portal   │
 └─────────────────────────────────────────────┘
@@ -427,27 +747,27 @@ Cliente chega
      ▼
 ┌─────────────────────────────────────────────┐
 │ 3. AGENDAMENTO                              │
-│    - Após aprovação, agenda data de entrada │
+│    - Apos aprovacao, agenda data de entrada │
 │    - Aparece na agenda da oficina           │
 └─────────────────────────────────────────────┘
      │
      ▼
 ┌─────────────────────────────────────────────┐
-│ 4. INÍCIO DO SERVIÇO                        │
+│ 4. INICIO DO SERVICO                        │
 │    - Preenche checklist de funcionalidades  │
 │    - Status muda para "Em andamento"        │
 └─────────────────────────────────────────────┘
      │
      ▼
 ┌─────────────────────────────────────────────┐
-│ 5. EXECUÇÃO                                 │
+│ 5. EXECUCAO                                 │
 │    - Fotos de progresso (aparecem no portal)│
 │    - Cliente acompanha pelo link            │
 └─────────────────────────────────────────────┘
      │
      ▼
 ┌─────────────────────────────────────────────┐
-│ 6. FINALIZAÇÃO                              │
+│ 6. FINALIZACAO                              │
 │    - Fotos finais                           │
 │    - Status "Finalizado"                    │
 │    - Cliente notificado para retirada       │
@@ -456,44 +776,64 @@ Cliente chega
 
 ---
 
-## Telas do App Interno
+## Telas do App
 
-### Menu Principal
+### Menu Principal (Tenant)
 
 ```
 ┌─────────────────────────────────┐
-│  Auto OS            │
+│  [Nome da Empresa]              │
 ├─────────────────────────────────┤
-│  Ordens de Serviço              │  ← Tela inicial
+│  Dashboard                      │
+│  Ordens de Servico              │
 │  Agenda                         │
 │  Clientes                       │
-│  Veículos                       │
-│  Serviços                       │  ← Com filtro por tipo
-│  Checklist (config)             │
-│  Fabricantes e Modelos          │  ← Admin
-│  Usuários                       │  ← Admin
+│  Veiculos                       │
+│  Servicos                       │
+│  Fabricantes e Modelos          │
+│  Checklist (config)             │  ← Admin
+│  Usuarios                       │  ← Admin
 └─────────────────────────────────┘
 ```
 
-### Telas
+### Menu SuperAdmin
+
+```
+┌─────────────────────────────────┐
+│  AutoOS - Admin                 │
+├─────────────────────────────────┤
+│  Empresas                       │
+└─────────────────────────────────┘
+```
+
+### Telas Tenant
 
 | Tela | Funcionalidade |
 |------|----------------|
-| **Ordens de Serviço** | Lista com filtros (status, data). Acesso rápido a cada OS |
-| **Nova OS / Editar OS** | Formulário: cliente, veículo, fotos, serviços, adicionais |
-| **Detalhe da OS** | Resumo, fotos, checklist, histórico, link do portal |
-| **Agenda** | Calendário com OS agendadas, visualização dia/semana |
+| **Dashboard** | Contadores, faturamento, ordens recentes |
+| **Ordens de Servico** | Lista com filtros (status, data). Acesso rapido a cada OS |
+| **Nova OS / Editar OS** | Formulario: cliente, veiculo, fotos, servicos, adicionais |
+| **Detalhe da OS** | Resumo, fotos, checklist, historico, link do portal, PDF |
+| **Agenda** | Calendario com OS agendadas |
 | **Clientes** | CRUD, busca por nome/telefone |
-| **Veículos** | CRUD, busca por placa, vinculado a cliente e modelo |
-| **Serviços** | CRUD com tipo (serviço/adicional), valores |
+| **Veiculos** | CRUD, busca por placa, vinculado a cliente e modelo |
+| **Servicos** | CRUD com tipo (servico/adicional), valores |
 | **Fabricantes e Modelos** | CRUD com seed inicial |
-| **Config Checklist** | Define itens padrão do checklist |
-| **Usuários** | Admin gerencia funcionários |
+| **Config Checklist** | Define itens padrao do checklist |
+| **Usuarios** | Admin gerencia funcionarios |
+
+### Telas SuperAdmin
+
+| Tela | Funcionalidade |
+|------|----------------|
+| **Lista Empresas** | Tabela com nome, slug, status (badge), vencimento, contadores |
+| **Criar/Editar Empresa** | Form: nome, slug, telefone, email, endereco, dataVencimento |
+| **Detalhe Empresa** | Info + stats + acoes de status + "Acessar como empresa" |
 
 ### Responsividade
 
 - **Desktop:** Menu lateral fixo, tabelas completas
-- **Mobile:** Menu hamburguer, cards em vez de tabelas, câmera nativa para fotos
+- **Mobile:** Menu hamburguer, cards em vez de tabelas, camera nativa para fotos
 
 ---
 
@@ -501,80 +841,49 @@ Cliente chega
 
 ### Acesso
 
-- URL: `seudominio.com.br/cliente/[token-unico]`
+- URL: `seudominio.com.br/portal/[token-unico]`
 - Sem login - token identifica a OS
 - Token gerado automaticamente ao criar OS
-
-### Layout
-
-```
-┌─────────────────────────────────────────────┐
-│  Auto OS                        │
-│  Acompanhamento do Serviço                  │
-├─────────────────────────────────────────────┤
-│  Cliente: João da Silva                     │
-│  Veículo: Honda Civic Preto - ABC-1234      │
-│  Status: Em andamento                       │
-├─────────────────────────────────────────────┤
-│  ORÇAMENTO                        R$ 1.250  │
-├─────────────────────────────────────────────┤
-│  • Pintura porta dianteira          R$ 400  │
-│  • Pintura paralama                 R$ 350  │
-│  • Cor perolizada                   R$ 150  │
-│  • Funilaria porta                  R$ 350  │
-├─────────────────────────────────────────────┤
-│  [ APROVAR ORÇAMENTO ]  ← só se aguardando  │
-├─────────────────────────────────────────────┤
-│  FOTOS DO VEÍCULO                           │
-│  Entrada (12/01): [img] [img] [img]         │
-│  Progresso (15/01): [img] [img]             │
-├─────────────────────────────────────────────┤
-│  CHECKLIST DE ENTRADA                       │
-│  ✓ Faróis funcionando                       │
-│  ✓ Vidros elétricos                         │
-│  ⚠ Ar condicionado - "Já não gelava"        │
-│  ✓ Travas elétricas                         │
-└─────────────────────────────────────────────┘
-```
+- Mostra dados da empresa (nome) no cabecalho
 
 ### Funcionalidades
 
-| Ação | Descrição |
+| Acao | Descricao |
 |------|-----------|
-| **Visualizar orçamento** | Sempre disponível |
-| **Aprovar orçamento** | Botão aparece só quando status é "Aguardando" |
+| **Visualizar orcamento** | Sempre disponivel |
+| **Aprovar orcamento** | Botao aparece so quando status e "Aguardando" |
 | **Ver fotos** | Organizadas por data e tipo |
-| **Ver checklist** | Estado do veículo na entrada |
+| **Ver checklist** | Estado do veiculo na entrada |
 
 ---
 
 ## Checklist de Funcionalidades
 
-### Itens Padrão
+### Itens Padrao
 
 ```
-ELÉTRICA
-- Faróis dianteiros
+ELETRICA
+- Farois dianteiros
 - Lanternas traseiras
 - Setas
 - Luz de freio
-- Vidros elétricos
-- Travas elétricas
-- Retrovisores elétricos
+- Vidros eletricos
+- Travas eletricas
+- Retrovisores eletricos
 
-CLIMATIZAÇÃO
+CLIMATIZACAO
 - Ar condicionado
-- Ventilação
+- Ventilacao
 
 GERAL
 - Buzina
 - Limpador de para-brisa
 - Painel sem alertas
-- Freio de mão
+- Freio de mao
 
-APARÊNCIA (pré-existentes)
+APARENCIA (pre-existentes)
 - Riscos na pintura
-- Amassados não relacionados ao serviço
+- Amassados nao relacionados ao servico
 - Para-choques
 ```
 
@@ -582,100 +891,49 @@ APARÊNCIA (pré-existentes)
 
 Para cada item:
 - **OK** - Funcionando normalmente
-- **Defeito** - Com problema (observação obrigatória)
-- **N/A** - Não se aplica
-
-### Proteção Legal
-
-- Registrado com data/hora e usuário
-- Visível no portal do cliente
-- Exportável em PDF
-
----
-
-## Permissões
-
-### Papéis
-
-| Papel | Descrição |
-|-------|-----------|
-| **ADMIN** | Acesso total, gerencia usuários e configurações |
-| **ATENDENTE** | Operação do dia-a-dia |
-
-### Matriz
-
-| Funcionalidade | ADMIN | ATENDENTE |
-|----------------|-------|-----------|
-| Ordens de Serviço (CRUD) | ✓ | ✓ |
-| Clientes (CRUD) | ✓ | ✓ |
-| Veículos (CRUD) | ✓ | ✓ |
-| Agenda | ✓ | ✓ |
-| Fotos | ✓ | ✓ |
-| Checklist (preencher) | ✓ | ✓ |
-| Serviços (CRUD) | ✓ | Só visualiza |
-| Fabricantes/Modelos (CRUD) | ✓ | Só visualiza |
-| Itens do Checklist (config) | ✓ | - |
-| Usuários (CRUD) | ✓ | - |
-
-### Regras
-
-- Primeiro usuário é automaticamente ADMIN
-- ADMIN não pode remover a si mesmo
-- ATENDENTE vê todas as OS
-
----
-
-## Preparação para Multi-tenant
-
-### Estratégia Futura: Banco por Tenant
-
-```
-┌─────────────────────────────────────────────┐
-│            App Principal                     │
-│       (código único, compartilhado)          │
-└─────────────────────────────────────────────┘
-                     │
-       ┌─────────────┼─────────────┐
-       ▼             ▼             ▼
-  ┌─────────┐   ┌─────────┐   ┌─────────┐
-  │ DB Ofi1 │   │ DB Ofi2 │   │ DB Ofi3 │
-  └─────────┘   └─────────┘   └─────────┘
-```
-
-### Fazer Agora
-
-- IDs não sequenciais (CUID)
-- Nome da oficina em variável de ambiente
-- Portal funciona com qualquer domínio
-- Fotos em cloud (Cloudinary)
-
-### NÃO Fazer Agora
-
-- Tabela de Oficina/Tenant
-- `oficinaId` em todas as tabelas
-- Sistema de assinaturas/pagamentos
-- Painel administrativo multi-tenant
+- **Defeito** - Com problema (observacao obrigatoria)
+- **N/A** - Nao se aplica
 
 ---
 
 ## Dados Iniciais (Seed)
 
-### Fabricantes e Modelos
+### Empresa Padrao
+- ID: `default-empresa`
+- Slug: `oficina-padrao`
+- Nome: `Oficina Padrao`
 
-```
-Chevrolet: Onix, Onix Plus, Tracker, S10, Spin, Cruze
-Fiat: Argo, Cronos, Mobi, Strada, Toro, Pulse
-Ford: Ka, EcoSport, Ranger, Territory
-Honda: Civic, City, HR-V, CR-V, Fit, WR-V
-Hyundai: HB20, HB20S, Creta, Tucson, Santa Fe
-Jeep: Renegade, Compass, Commander
-Nissan: Kicks, Versa, Frontier, Sentra
-Peugeot: 208, 2008, 3008, Partner
-Renault: Kwid, Sandero, Logan, Duster, Oroch
-Toyota: Corolla, Corolla Cross, Hilux, Yaris, SW4
-Volkswagen: Gol, Polo, Virtus, T-Cross, Nivus, Amarok
-```
+### Usuarios Iniciais
 
-### Itens do Checklist
+| Email | Senha | Papel | Empresa |
+|-------|-------|-------|---------|
+| `super@autoos.com` | `super123` | SUPERADMIN | oficina-padrao |
+| `admin@oficina.com` | `admin123` | ADMIN | oficina-padrao |
 
-Conforme listado na seção "Checklist de Funcionalidades".
+### Outros Dados
+
+| Dado | Quantidade |
+|------|-----------|
+| Fabricantes | 30 |
+| Modelos de veiculos | 150+ |
+| Servicos | 18 |
+| Itens de checklist | 16 |
+
+---
+
+## Email e Relatorios
+
+### Email
+
+Emails sao enviados com o nome da empresa no assunto:
+- Orcamento criado: `Orcamento para [PLACA] - [EMPRESA]`
+- Orcamento aprovado: `Orcamento Aprovado - [PLACA] - [EMPRESA]`
+- Servico finalizado: `Servico Finalizado - [PLACA] - [EMPRESA]`
+
+### PDF de Orcamento
+
+Gerado via `pdfmake` com dados da empresa no cabecalho:
+- Nome da empresa
+- Endereco
+- Telefone
+- Link do portal para aprovacao

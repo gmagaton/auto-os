@@ -32,17 +32,6 @@ export class LoginComponent {
   private router = inject(Router);
   private tenantService = inject(TenantService);
 
-  constructor() {
-    // Redirecionar se ja logado
-    if (this.authService.isLoggedIn()) {
-      if (this.authService.isSuperAdmin()) {
-        this.router.navigate(['/admin']);
-      } else {
-        this.router.navigate([this.tenantService.route('/dashboard')]);
-      }
-    }
-  }
-
   login() {
     this.loading = true;
     this.error = '';

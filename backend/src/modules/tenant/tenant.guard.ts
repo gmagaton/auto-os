@@ -15,6 +15,17 @@ export class TenantGuard implements CanActivate {
     const user = request.user;
 
     if (user?.papel === 'SUPERADMIN') {
+      // Resolve empresa slug from header so TenantService can use the correct empresaId
+      const slug = request.headers['x-empresa-slug'] as string;
+      if (slug) {
+        const empresa = await this.prisma.empresa.findUnique({
+          where: { slug },
+          select: { id: true },
+        });
+        if (empresa) {
+          request.tenantEmpresaId = empresa.id;
+        }
+      }
       return true;
     }
 
