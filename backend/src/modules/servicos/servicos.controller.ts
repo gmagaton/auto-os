@@ -15,10 +15,11 @@ import { UpdateServicoDto } from './dto/update-servico.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { TenantGuard } from '../tenant/tenant.guard';
 import { TipoServico } from '../../../generated/prisma/enums';
 
 @Controller('servicos')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, TenantGuard)
 export class ServicosController {
   constructor(private servicosService: ServicosService) {}
 

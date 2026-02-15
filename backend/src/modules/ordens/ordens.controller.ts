@@ -18,10 +18,11 @@ import { UpdateOrdemDto } from './dto/update-ordem.dto';
 import { CreateFotoDto } from './dto/create-foto.dto';
 import { FiltroOrdensDto } from './dto/filtro-ordens.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { TenantGuard } from '../tenant/tenant.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 @Controller('ordens')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, TenantGuard)
 export class OrdensController {
   constructor(
     private readonly ordensService: OrdensService,

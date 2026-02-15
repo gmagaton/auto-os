@@ -12,8 +12,19 @@ export class AuthService {
   ) {}
 
   async login(dto: LoginDto) {
-    const usuario = await this.prisma.usuario.findUnique({
+    const usuario = await this.prisma.usuario.findFirst({
       where: { email: dto.email },
+      include: {
+        empresa: {
+          select: {
+            id: true,
+            slug: true,
+            nome: true,
+            logoUrl: true,
+            status: true,
+          },
+        },
+      },
     });
 
     if (!usuario) {
@@ -24,13 +35,25 @@ export class AuthService {
       throw new UnauthorizedException('Usuário inativo');
     }
 
+    if (
+      usuario.empresa &&
+      usuario.empresa.status !== 'ATIVA' &&
+      usuario.papel !== 'SUPERADMIN'
+    ) {
+      throw new UnauthorizedException('Empresa inativa');
+    }
+
     const senhaValida = await bcrypt.compare(dto.senha, usuario.senha);
 
     if (!senhaValida) {
       throw new UnauthorizedException('Credenciais inválidas');
     }
 
-    const payload = { sub: usuario.id, email: usuario.email };
+    const payload = {
+      sub: usuario.id,
+      email: usuario.email,
+      empresaId: usuario.empresaId,
+    };
 
     return {
       access_token: this.jwtService.sign(payload),
@@ -39,7 +62,16 @@ export class AuthService {
         nome: usuario.nome,
         email: usuario.email,
         papel: usuario.papel,
+        empresaId: usuario.empresaId,
       },
+      empresa: usuario.empresa
+        ? {
+            id: usuario.empresa.id,
+            slug: usuario.empresa.slug,
+            nome: usuario.empresa.nome,
+            logoUrl: usuario.empresa.logoUrl,
+          }
+        : null,
     };
   }
 
@@ -51,6 +83,16 @@ export class AuthService {
         nome: true,
         email: true,
         papel: true,
+        empresaId: true,
+        empresa: {
+          select: {
+            id: true,
+            slug: true,
+            nome: true,
+            logoUrl: true,
+            status: true,
+          },
+        },
       },
     });
   }
