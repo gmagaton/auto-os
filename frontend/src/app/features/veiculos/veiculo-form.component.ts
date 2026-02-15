@@ -15,6 +15,7 @@ import { Observable, map, startWith, switchMap, debounceTime, of } from 'rxjs';
 import { VeiculosService } from './veiculos.service';
 import { FabricantesService, Fabricante, Modelo } from '../fabricantes/fabricantes.service';
 import { ClientesService, Cliente } from '../clientes/clientes.service';
+import { TenantService } from '../../core/services/tenant.service';
 
 @Component({
   selector: 'app-veiculo-form',
@@ -43,6 +44,7 @@ export class VeiculoFormComponent implements OnInit {
   private readonly fabricantesService = inject(FabricantesService);
   private readonly clientesService = inject(ClientesService);
   private readonly snackBar = inject(MatSnackBar);
+  public readonly tenantService = inject(TenantService);
 
   loading = signal(false);
   loadingData = signal(true);
@@ -149,7 +151,7 @@ export class VeiculoFormComponent implements OnInit {
       },
       error: () => {
         this.snackBar.open('Erro ao carregar veiculo', 'Fechar', { duration: 3000 });
-        this.router.navigate(['/veiculos']);
+        this.router.navigate([this.tenantService.route('/veiculos')]);
       },
     });
   }
@@ -233,7 +235,7 @@ export class VeiculoFormComponent implements OnInit {
           'Fechar',
           { duration: 3000 }
         );
-        this.router.navigate(['/veiculos']);
+        this.router.navigate([this.tenantService.route('/veiculos')]);
       },
       error: (err) => {
         this.loading.set(false);

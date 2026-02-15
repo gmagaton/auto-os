@@ -6,7 +6,7 @@
   <!-- Header compacto -->
   <div class="detail-header-compact">
     <div class="header-left">
-      <button mat-icon-button routerLink="/clientes">
+      <button mat-icon-button [routerLink]="tenantService.route('/clientes')">
         <mat-icon>arrow_back</mat-icon>
       </button>
       <h1>{{ cliente()!.nome }}</h1>

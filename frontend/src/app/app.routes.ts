@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
+import { tenantGuard } from './core/guards/tenant.guard';
+import { superAdminGuard } from './core/guards/superadmin.guard';
 import { LayoutComponent } from './layout/layout.component';
 
 export const routes: Routes = [
@@ -11,10 +13,25 @@ export const routes: Routes = [
       import('./features/landing/landing.component').then((m) => m.LandingComponent),
   },
   {
-    path: '',
+    path: 'login',
+    loadComponent: () =>
+      import('./features/login/login.component').then((m) => m.LoginComponent),
+  },
+  {
+    path: 'portal',
+    loadChildren: () => import('./features/portal/portal.routes').then(m => m.portalRoutes),
+  },
+  {
+    path: 'admin',
+    canActivate: [authGuard, superAdminGuard],
+    loadChildren: () => import('./features/admin/admin.routes').then(m => m.adminRoutes),
+  },
+  {
+    path: ':slug',
     component: LayoutComponent,
-    canActivate: [authGuard],
+    canActivate: [tenantGuard],
     children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
         loadChildren: () =>
@@ -55,14 +72,5 @@ export const routes: Routes = [
         loadChildren: () => import('./features/agenda/agenda.routes').then(m => m.agendaRoutes),
       },
     ],
-  },
-  {
-    path: 'login',
-    loadComponent: () =>
-      import('./features/login/login.component').then((m) => m.LoginComponent),
-  },
-  {
-    path: 'portal',
-    loadChildren: () => import('./features/portal/portal.routes').then(m => m.portalRoutes),
   },
 ];

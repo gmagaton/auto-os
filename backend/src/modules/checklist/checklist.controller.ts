@@ -16,10 +16,11 @@ import { PreencherChecklistDto } from './dto/preencher-checklist.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { TenantGuard } from '../tenant/tenant.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 @Controller('checklist')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, TenantGuard)
 export class ChecklistController {
   constructor(private checklistService: ChecklistService) {}
 

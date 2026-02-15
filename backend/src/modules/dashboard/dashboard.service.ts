@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { TenantService } from '../tenant/tenant.service';
 
 @Injectable()
 export class DashboardService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly tenant: TenantService,
+  ) {}
 
   async getDashboard() {
     const hoje = new Date();
@@ -11,13 +15,16 @@ export class DashboardService {
     const amanha = new Date(hoje);
     amanha.setDate(amanha.getDate() + 1);
 
+    const empresaId = this.tenant.empresaId;
+
     // Contadores operacionais
     const [aguardando, aprovado, emAndamento, agendadasHoje] = await Promise.all([
-      this.prisma.ordemServico.count({ where: { status: 'AGUARDANDO' } }),
-      this.prisma.ordemServico.count({ where: { status: 'APROVADO' } }),
-      this.prisma.ordemServico.count({ where: { status: 'EM_ANDAMENTO' } }),
+      this.prisma.ordemServico.count({ where: { status: 'AGUARDANDO', empresaId } }),
+      this.prisma.ordemServico.count({ where: { status: 'APROVADO', empresaId } }),
+      this.prisma.ordemServico.count({ where: { status: 'EM_ANDAMENTO', empresaId } }),
       this.prisma.ordemServico.count({
         where: {
+          empresaId,
           dataAgendada: { gte: hoje, lt: amanha },
           status: { in: ['APROVADO', 'EM_ANDAMENTO'] },
         },
@@ -45,6 +52,7 @@ export class DashboardService {
   private async getFaturamentoMensal() {
     const resultado: { mes: string; total: number }[] = [];
     const hoje = new Date();
+    const empresaId = this.tenant.empresaId;
 
     for (let i = 5; i >= 0; i--) {
       const data = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
@@ -52,6 +60,7 @@ export class DashboardService {
 
       const agregado = await this.prisma.ordemServico.aggregate({
         where: {
+          empresaId,
           status: 'FINALIZADO',
           atualizadoEm: { gte: data, lt: proximoMes },
         },
@@ -68,8 +77,11 @@ export class DashboardService {
   }
 
   private async getServicosTop() {
+    const empresaId = this.tenant.empresaId;
+
     const servicos = await this.prisma.itemOrcamento.groupBy({
       by: ['servicoId'],
+      where: { ordem: { empresaId } },
       _count: { servicoId: true },
       orderBy: { _count: { servicoId: 'desc' } },
       take: 5,

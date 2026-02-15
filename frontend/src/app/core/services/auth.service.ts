@@ -2,6 +2,7 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { ApiService } from './api.service';
+import { TenantService } from './tenant.service';
 import { Usuario, LoginResponse } from '../models/usuario.model';
 
 const TOKEN_KEY = 'access_token';
@@ -13,6 +14,7 @@ const USER_KEY = 'usuario';
 export class AuthService {
   private readonly api = inject(ApiService);
   private readonly router = inject(Router);
+  private readonly tenantService = inject(TenantService);
 
   private readonly usuarioSignal = signal<Usuario | null>(null);
   private readonly tokenSignal = signal<string | null>(null);
@@ -21,7 +23,11 @@ export class AuthService {
   readonly token = this.tokenSignal.asReadonly();
 
   readonly isLoggedIn = computed(() => !!this.tokenSignal() && !!this.usuarioSignal());
-  readonly isAdmin = computed(() => this.usuarioSignal()?.papel === 'ADMIN');
+  readonly isSuperAdmin = computed(() => this.usuarioSignal()?.papel === 'SUPERADMIN');
+  readonly isAdmin = computed(() => {
+    const papel = this.usuarioSignal()?.papel;
+    return papel === 'ADMIN' || papel === 'SUPERADMIN';
+  });
 
   constructor() {
     this.loadFromStorage();
@@ -57,6 +63,10 @@ export class AuthService {
         this.usuarioSignal.set(response.usuario);
         localStorage.setItem(TOKEN_KEY, response.access_token);
         localStorage.setItem(USER_KEY, JSON.stringify(response.usuario));
+
+        if (response.empresa) {
+          this.tenantService.setEmpresa(response.empresa);
+        }
       })
     );
   }
@@ -64,6 +74,7 @@ export class AuthService {
   logout(): void {
     this.tokenSignal.set(null);
     this.usuarioSignal.set(null);
+    this.tenantService.clear();
     this.clearStorage();
     this.router.navigate(['/login']);
   }

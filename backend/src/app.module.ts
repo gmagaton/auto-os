@@ -19,6 +19,8 @@ import { EmailModule } from './modules/email/email.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { RelatoriosModule } from './modules/relatorios/relatorios.module';
 import { HealthModule } from './health/health.module';
+import { TenantModule } from './modules/tenant/tenant.module';
+import { EmpresasModule } from './modules/empresas/empresas.module';
 
 @Module({
   imports: [
@@ -50,6 +52,8 @@ import { HealthModule } from './health/health.module';
       }),
     }),
     PrismaModule,
+    TenantModule,
+    EmpresasModule,
     AuthModule,
     UsuariosModule,
     ClientesModule,

@@ -21,6 +21,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { debounceTime, Subject } from 'rxjs';
 import { FiltroOrdens, Ordem, OrdensService, StatusOS } from './ordens.service';
 import { DialogService } from '../../shared/services/dialog.service';
+import { TenantService } from '../../core/services/tenant.service';
 
 @Component({
   selector: 'app-ordem-list',
@@ -54,6 +55,7 @@ export class OrdemListComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly route = inject(ActivatedRoute);
   private readonly dialogService = inject(DialogService);
+  private readonly tenantService = inject(TenantService);
 
   private readonly searchSubject = new Subject<string>();
 
@@ -175,15 +177,15 @@ export class OrdemListComponent implements OnInit {
   }
 
   criarNova(): void {
-    this.router.navigate(['/ordens/nova']);
+    this.router.navigate([this.tenantService.route('/ordens/nova')]);
   }
 
   verDetalhes(ordem: Ordem): void {
-    this.router.navigate(['/ordens', ordem.id]);
+    this.router.navigate([this.tenantService.route('/ordens'), ordem.id]);
   }
 
   editar(ordem: Ordem): void {
-    this.router.navigate(['/ordens', ordem.id, 'editar']);
+    this.router.navigate([this.tenantService.route('/ordens'), ordem.id, 'editar']);
   }
 
   confirmDelete(ordem: Ordem): void {

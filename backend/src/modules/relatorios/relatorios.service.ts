@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { TenantService } from '../tenant/tenant.service';
 import { ConfigService } from '@nestjs/config';
 import { TDocumentDefinitions, Content, TableCell } from 'pdfmake/interfaces';
 
@@ -12,6 +13,7 @@ export class RelatoriosService {
 
   constructor(
     private readonly prisma: PrismaService,
+    private readonly tenant: TenantService,
     private readonly configService: ConfigService,
   ) {
     const fonts = {
@@ -26,8 +28,8 @@ export class RelatoriosService {
   }
 
   async gerarOrcamentoPdf(ordemId: string): Promise<Buffer> {
-    const ordem = await this.prisma.ordemServico.findUnique({
-      where: { id: ordemId },
+    const ordem = await this.prisma.ordemServico.findFirst({
+      where: { id: ordemId, empresaId: this.tenant.empresaId },
       include: {
         veiculo: {
           include: {
@@ -36,16 +38,17 @@ export class RelatoriosService {
           },
         },
         itens: { include: { servico: true } },
+        empresa: true,
       },
     });
 
     if (!ordem) {
-      throw new Error('Ordem não encontrada');
+      throw new NotFoundException('Ordem não encontrada');
     }
 
-    const oficinaNome = this.configService.get('OFICINA_NOME', 'AutoOS');
-    const oficinaEndereco = this.configService.get('OFICINA_ENDERECO', '');
-    const oficinaTelefone = this.configService.get('OFICINA_TELEFONE', '');
+    const oficinaNome = ordem.empresa?.nome || this.configService.get('OFICINA_NOME', 'AutoOS');
+    const oficinaEndereco = ordem.empresa?.endereco ?? this.configService.get('OFICINA_ENDERECO', '') ?? '';
+    const oficinaTelefone = ordem.empresa?.telefone ?? this.configService.get('OFICINA_TELEFONE', '') ?? '';
     const frontendUrl = this.configService.get('FRONTEND_URL', 'http://localhost:4200');
 
     // Build vehicle info rows

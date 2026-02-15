@@ -13,9 +13,10 @@ import { VeiculosService } from './veiculos.service';
 import { CreateVeiculoDto } from './dto/create-veiculo.dto';
 import { UpdateVeiculoDto } from './dto/update-veiculo.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { TenantGuard } from '../tenant/tenant.guard';
 
 @Controller('veiculos')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, TenantGuard)
 export class VeiculosController {
   constructor(private veiculosService: VeiculosService) {}
 

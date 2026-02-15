@@ -105,6 +105,20 @@ const fabricantesModelos = {
 async function main() {
   console.log('Seeding database...');
 
+  // Criar empresa padrao
+  const defaultEmpresaId = 'default-empresa';
+  await prisma.empresa.upsert({
+    where: { id: defaultEmpresaId },
+    update: {},
+    create: {
+      id: defaultEmpresaId,
+      nome: 'Oficina Padrao',
+      slug: 'oficina-padrao',
+      status: 'ATIVA',
+    },
+  });
+  console.log('Empresa padrao criada (oficina-padrao)');
+
   // Criar fabricantes e modelos
   for (const [fabricanteNome, modelos] of Object.entries(fabricantesModelos)) {
     const fabricante = await prisma.fabricante.upsert({
@@ -132,16 +146,42 @@ async function main() {
     console.log(`Fabricante ${fabricanteNome}: ${modelos.length} modelos`);
   }
 
+  // Criar usuario superadmin
+  const senhaSuperHash = await bcrypt.hash('super123', 12);
+  await prisma.usuario.upsert({
+    where: {
+      email_empresaId: {
+        email: 'super@autoos.com',
+        empresaId: defaultEmpresaId,
+      },
+    },
+    update: {},
+    create: {
+      nome: 'Super Admin',
+      email: 'super@autoos.com',
+      senha: senhaSuperHash,
+      papel: 'SUPERADMIN',
+      empresaId: defaultEmpresaId,
+    },
+  });
+  console.log('Usuario superadmin criado (super@autoos.com / super123)');
+
   // Criar usuario admin inicial
   const senhaHash = await bcrypt.hash('admin123', 12);
   await prisma.usuario.upsert({
-    where: { email: 'admin@oficina.com' },
+    where: {
+      email_empresaId: {
+        email: 'admin@oficina.com',
+        empresaId: defaultEmpresaId,
+      },
+    },
     update: {},
     create: {
       nome: 'Administrador',
       email: 'admin@oficina.com',
       senha: senhaHash,
       papel: 'ADMIN',
+      empresaId: defaultEmpresaId,
     },
   });
   console.log('Usuario admin criado (admin@oficina.com / admin123)');
@@ -190,6 +230,7 @@ async function main() {
         tipo: servico.tipo as 'SERVICO' | 'ADICIONAL',
         valor: servico.valor,
         ativo: true,
+        empresaId: defaultEmpresaId,
       },
     });
   }

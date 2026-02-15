@@ -14,10 +14,11 @@ import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { TenantGuard } from '../tenant/tenant.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 @Controller('usuarios')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, TenantGuard, RolesGuard)
 @Roles('ADMIN')
 export class UsuariosController {
   constructor(private usuariosService: UsuariosService) {}

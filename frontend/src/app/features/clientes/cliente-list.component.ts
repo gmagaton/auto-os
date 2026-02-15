@@ -14,6 +14,7 @@ import { debounceTime, Subject } from 'rxjs';
 import { Cliente, ClientesService } from './clientes.service';
 import { DialogService } from '../../shared/services/dialog.service';
 import { ClienteFormComponent, ClienteFormData } from './cliente-form.component';
+import { TenantService } from '../../core/services/tenant.service';
 
 @Component({
   selector: 'app-cliente-list',
@@ -38,6 +39,7 @@ export class ClienteListComponent implements OnInit {
   private readonly dialogService = inject(DialogService);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly tenantService = inject(TenantService);
 
   private readonly searchSubject = new Subject<string>();
 
@@ -84,7 +86,7 @@ export class ClienteListComponent implements OnInit {
   }
 
   goToDetail(cliente: Cliente): void {
-    this.router.navigate(['/clientes', cliente.id]);
+    this.router.navigate([this.tenantService.route('/clientes'), cliente.id]);
   }
 
   openForm(cliente?: Cliente): void {

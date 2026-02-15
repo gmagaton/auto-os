@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { OrdensService, Ordem } from '../ordens/ordens.service';
+import { TenantService } from '../../core/services/tenant.service';
 
 @Component({
   selector: 'app-agenda',
@@ -27,6 +28,7 @@ export class AgendaComponent implements AfterViewInit {
   private readonly ordensService = inject(OrdensService);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly tenantService = inject(TenantService);
 
   @ViewChild('calendar') calendarComponent!: FullCalendarComponent;
 
@@ -98,6 +100,6 @@ export class AgendaComponent implements AfterViewInit {
 
   onEventClick(info: EventClickArg): void {
     const ordem = info.event.extendedProps['ordem'] as Ordem;
-    this.router.navigate(['/ordens', ordem.id]);
+    this.router.navigate([this.tenantService.route('/ordens'), ordem.id]);
   }
 }
