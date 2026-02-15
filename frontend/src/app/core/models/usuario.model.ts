@@ -1,9 +1,6 @@
-export interface Empresa {
-  id: string;
-  slug: string;
-  nome: string;
-  logoUrl?: string;
-}
+import { Empresa } from '../services/tenant.service';
+
+export type { Empresa };
 
 export type Papel = 'SUPERADMIN' | 'ADMIN' | 'ATENDENTE';
 

@@ -1,44 +1,35 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSidenavModule, MatSidenav } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, MatToolbarModule, MatSidenavModule, MatListModule, MatIconModule, MatButtonModule],
-  template: `
-    <mat-toolbar color="primary">
-      <span>AutoOS Admin</span>
-      <span class="spacer"></span>
-      <button mat-button (click)="authService.logout()">
-        <mat-icon>exit_to_app</mat-icon>
-        Sair
-      </button>
-    </mat-toolbar>
-    <div class="admin-content">
-      <mat-nav-list class="admin-sidenav">
-        <a mat-list-item routerLink="/admin/empresas" routerLinkActive="active">
-          <mat-icon matListItemIcon>business</mat-icon>
-          <span matListItemTitle>Empresas</span>
-        </a>
-      </mat-nav-list>
-      <div class="admin-main">
-        <router-outlet />
-      </div>
-    </div>
-  `,
-  styles: [`
-    .spacer { flex: 1 1 auto; }
-    .admin-content { display: flex; height: calc(100vh - 64px); }
-    .admin-sidenav { width: 240px; border-right: 1px solid #e0e0e0; }
-    .admin-main { flex: 1; padding: 24px; overflow-y: auto; }
-  `],
+  templateUrl: './admin-layout.component.html',
 })
 export class AdminLayoutComponent {
-  constructor(public authService: AuthService) {}
+  @ViewChild('sidenav') sidenav!: MatSidenav;
+  isMobile = signal(false);
+
+  constructor(
+    public authService: AuthService,
+    private breakpointObserver: BreakpointObserver,
+  ) {
+    this.breakpointObserver.observe([Breakpoints.Handset]).subscribe(result => {
+      this.isMobile.set(result.matches);
+    });
+  }
+
+  closeSidenavOnMobile(): void {
+    if (this.isMobile()) {
+      this.sidenav.close();
+    }
+  }
 }

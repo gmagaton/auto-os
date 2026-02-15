@@ -7,8 +7,6 @@ export interface Empresa {
   logoUrl?: string;
 }
 
-const EMPRESA_KEY = 'empresa';
-
 @Injectable({ providedIn: 'root' })
 export class TenantService {
   private readonly empresaSignal = signal<Empresa | null>(null);
@@ -17,29 +15,18 @@ export class TenantService {
   readonly slug = computed(() => this.empresaSignal()?.slug || '');
 
   constructor() {
-    this.loadFromStorage();
-  }
-
-  private loadFromStorage(): void {
-    if (typeof window === 'undefined') return;
-    const json = localStorage.getItem(EMPRESA_KEY);
-    if (json) {
-      try {
-        this.empresaSignal.set(JSON.parse(json));
-      } catch {
-        localStorage.removeItem(EMPRESA_KEY);
-      }
+    // Clean up old localStorage key (migration)
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('empresa');
     }
   }
 
   setEmpresa(empresa: Empresa): void {
     this.empresaSignal.set(empresa);
-    localStorage.setItem(EMPRESA_KEY, JSON.stringify(empresa));
   }
 
   clear(): void {
     this.empresaSignal.set(null);
-    localStorage.removeItem(EMPRESA_KEY);
   }
 
   route(path: string): string {

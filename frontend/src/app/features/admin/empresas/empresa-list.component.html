@@ -1,0 +1,115 @@
+<div class="list-header">
+  <h1>Empresas</h1>
+  <button mat-mini-fab color="primary" (click)="router.navigate(['/admin/empresas/nova'])" class="fab-add">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>
+
+<div class="list-search">
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-icon matPrefix>search</mat-icon>
+    <input matInput [(ngModel)]="busca" (ngModelChange)="onSearchChange($event)" placeholder="Buscar empresa..." />
+  </mat-form-field>
+</div>
+
+@if (loading()) {
+  <div class="loading">
+    <mat-spinner diameter="40" />
+  </div>
+} @else {
+  <!-- Desktop: Table view -->
+  <div class="table-container hide-mobile">
+    <table mat-table [dataSource]="empresas()">
+      <ng-container matColumnDef="nome">
+        <th mat-header-cell *matHeaderCellDef>Nome</th>
+        <td mat-cell *matCellDef="let e">{{ e.nome }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="slug">
+        <th mat-header-cell *matHeaderCellDef>Slug</th>
+        <td mat-cell *matCellDef="let e">{{ e.slug }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let e">
+          <span class="status-badge" [class]="'status-' + e.status.toLowerCase()">{{ e.status }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="usuarios">
+        <th mat-header-cell *matHeaderCellDef>Usuarios</th>
+        <td mat-cell *matCellDef="let e">{{ e._count.usuarios }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="ordens">
+        <th mat-header-cell *matHeaderCellDef>Ordens</th>
+        <td mat-cell *matCellDef="let e">{{ e._count.ordens }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="vencimento">
+        <th mat-header-cell *matHeaderCellDef>Vencimento</th>
+        <td mat-cell *matCellDef="let e">{{ e.dataVencimento | date:'dd/MM/yyyy' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="acoes">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let e">
+          <button mat-icon-button [matMenuTriggerFor]="menuDesktop">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menuDesktop="matMenu">
+            <button mat-menu-item (click)="router.navigate(['/admin/empresas', e.id])">
+              <mat-icon>visibility</mat-icon> Detalhes
+            </button>
+            <button mat-menu-item (click)="router.navigate(['/admin/empresas', e.id, 'editar'])">
+              <mat-icon>edit</mat-icon> Editar
+            </button>
+            <button mat-menu-item (click)="acessarEmpresa(e)">
+              <mat-icon>open_in_new</mat-icon> Acessar
+            </button>
+            @if (e.status === 'ATIVA') {
+              <button mat-menu-item (click)="alterarStatus(e.id, 'SUSPENSA')">
+                <mat-icon>pause</mat-icon> Suspender
+              </button>
+            }
+            @if (e.status === 'SUSPENSA') {
+              <button mat-menu-item (click)="alterarStatus(e.id, 'ATIVA')">
+                <mat-icon>play_arrow</mat-icon> Reativar
+              </button>
+            }
+          </mat-menu>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="clickable-row" (click)="router.navigate(['/admin/empresas', row.id])"></tr>
+    </table>
+  </div>
+
+  <!-- Mobile: Lista compacta -->
+  <div class="compact-list">
+    @for (e of empresas(); track e.id) {
+      <div class="compact-card" (click)="router.navigate(['/admin/empresas', e.id])">
+        <div class="compact-main">
+          <div class="compact-info">
+            <span class="compact-title">{{ e.nome }}</span>
+            <span class="compact-subtitle">{{ e.slug }}</span>
+          </div>
+          <div class="compact-meta">
+            <span class="status-badge" [class]="'status-' + e.status.toLowerCase()">{{ e.status }}</span>
+            <mat-icon class="compact-chevron">chevron_right</mat-icon>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (empresas().length === 0) {
+    <div class="empty-message">
+      <mat-icon>business</mat-icon>
+      <h3>Nenhuma empresa encontrada</h3>
+      <p>Adicione uma nova empresa para comecar</p>
+    </div>
+  }
+}

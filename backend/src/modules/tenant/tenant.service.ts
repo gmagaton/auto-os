@@ -7,7 +7,17 @@ export class TenantService {
   constructor(@Inject(REQUEST) private readonly request: Request) {}
 
   get empresaId(): string {
-    const id = (this.request as any).user?.empresaId;
+    const user = (this.request as any).user;
+
+    // SUPERADMIN: use the empresa ID resolved by TenantGuard from X-Empresa-Slug header
+    if (user?.papel === 'SUPERADMIN') {
+      const resolved = (this.request as any).tenantEmpresaId;
+      if (resolved) {
+        return resolved;
+      }
+    }
+
+    const id = user?.empresaId;
     if (!id) {
       throw new ForbiddenException('Usuário não vinculado a uma empresa');
     }
