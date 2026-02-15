@@ -4,17 +4,22 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { TenantService } from '../tenant/tenant.service';
 import { CreateServicoDto } from './dto/create-servico.dto';
 import { UpdateServicoDto } from './dto/update-servico.dto';
 import { TipoServico } from '../../../generated/prisma/enums';
 
 @Injectable()
 export class ServicosService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private tenant: TenantService,
+  ) {}
 
   async findAll(tipo?: TipoServico) {
     return this.prisma.servico.findMany({
       where: {
+        empresaId: this.tenant.empresaId,
         ativo: true,
         ...(tipo && { tipo }),
       },
@@ -23,8 +28,8 @@ export class ServicosService {
   }
 
   async findOne(id: string) {
-    const servico = await this.prisma.servico.findUnique({
-      where: { id },
+    const servico = await this.prisma.servico.findFirst({
+      where: { id, empresaId: this.tenant.empresaId },
     });
 
     if (!servico) {
@@ -40,6 +45,7 @@ export class ServicosService {
         nome: dto.nome,
         tipo: dto.tipo,
         valor: dto.valor,
+        empresaId: this.tenant.empresaId,
       },
     });
   }

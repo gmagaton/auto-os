@@ -1,14 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { TenantService } from '../tenant/tenant.service';
 import { CreateItemChecklistDto } from './dto/create-item-checklist.dto';
 import { UpdateItemChecklistDto } from './dto/update-item-checklist.dto';
 import { PreencherChecklistDto } from './dto/preencher-checklist.dto';
 
 @Injectable()
 export class ChecklistService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private tenant: TenantService,
+  ) {}
 
-  // === ITENS CONFIG ===
+  // === ITENS CONFIG (shared, not tenant-scoped) ===
 
   async findAllItens(includeInactive = false) {
     return this.prisma.itemChecklist.findMany({
@@ -65,12 +69,12 @@ export class ChecklistService {
     return items.map((i) => i.categoria);
   }
 
-  // === CHECKLIST PREENCHIDO ===
+  // === CHECKLIST PREENCHIDO (tenant-scoped) ===
 
   async preencherChecklist(ordemId: string, dto: PreencherChecklistDto, usuarioId: string) {
-    // Verificar se ordem existe
-    const ordem = await this.prisma.ordemServico.findUnique({
-      where: { id: ordemId },
+    // Verificar se ordem existe and belongs to this tenant
+    const ordem = await this.prisma.ordemServico.findFirst({
+      where: { id: ordemId, empresaId: this.tenant.empresaId },
     });
 
     if (!ordem) {
@@ -98,6 +102,7 @@ export class ChecklistService {
             status: item.status,
             observacao: item.observacao,
             usuarioId,
+            empresaId: this.tenant.empresaId,
           },
           include: {
             item: true,
@@ -119,9 +124,9 @@ export class ChecklistService {
       orderBy: [{ categoria: 'asc' }, { ordem: 'asc' }],
     });
 
-    // Get filled items for this order
+    // Get filled items for this order, scoped to tenant
     const preenchidos = await this.prisma.checklistPreenchido.findMany({
-      where: { ordemId },
+      where: { ordemId, empresaId: this.tenant.empresaId },
       include: {
         item: true,
         usuario: {
@@ -145,7 +150,7 @@ export class ChecklistService {
     });
 
     const preenchidos = await this.prisma.checklistPreenchido.count({
-      where: { ordemId },
+      where: { ordemId, empresaId: this.tenant.empresaId },
     });
 
     return {

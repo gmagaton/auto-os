@@ -6,15 +6,20 @@ import {
 } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../../prisma/prisma.service';
+import { TenantService } from '../tenant/tenant.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 
 @Injectable()
 export class UsuariosService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private tenant: TenantService,
+  ) {}
 
   async findAll() {
     return this.prisma.usuario.findMany({
+      where: { empresaId: this.tenant.empresaId },
       select: {
         id: true,
         nome: true,
@@ -28,8 +33,8 @@ export class UsuariosService {
   }
 
   async findOne(id: string) {
-    const usuario = await this.prisma.usuario.findUnique({
-      where: { id },
+    const usuario = await this.prisma.usuario.findFirst({
+      where: { id, empresaId: this.tenant.empresaId },
       select: {
         id: true,
         nome: true,
@@ -48,8 +53,8 @@ export class UsuariosService {
   }
 
   async create(dto: CreateUsuarioDto) {
-    const existe = await this.prisma.usuario.findUnique({
-      where: { email: dto.email },
+    const existe = await this.prisma.usuario.findFirst({
+      where: { email: dto.email, empresaId: this.tenant.empresaId },
     });
 
     if (existe) {
@@ -64,6 +69,7 @@ export class UsuariosService {
         email: dto.email,
         senha: senhaHash,
         papel: dto.papel,
+        empresaId: this.tenant.empresaId,
       },
       select: {
         id: true,
@@ -83,6 +89,7 @@ export class UsuariosService {
       const existe = await this.prisma.usuario.findFirst({
         where: {
           email: dto.email,
+          empresaId: this.tenant.empresaId,
           NOT: { id },
         },
       });
@@ -96,7 +103,7 @@ export class UsuariosService {
       nome?: string;
       email?: string;
       senha?: string;
-      papel?: 'ADMIN' | 'ATENDENTE';
+      papel?: 'ADMIN' | 'ATENDENTE' | 'SUPERADMIN';
       ativo?: boolean;
     } = { ...dto };
     if (dto.senha) {

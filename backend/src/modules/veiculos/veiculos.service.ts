@@ -4,16 +4,21 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { TenantService } from '../tenant/tenant.service';
 import { CreateVeiculoDto } from './dto/create-veiculo.dto';
 import { UpdateVeiculoDto } from './dto/update-veiculo.dto';
 
 @Injectable()
 export class VeiculosService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private tenant: TenantService,
+  ) {}
 
   async findAll(clienteId?: string, busca?: string) {
     return this.prisma.veiculo.findMany({
       where: {
+        empresaId: this.tenant.empresaId,
         ...(clienteId && { clienteId }),
         ...(busca && {
           OR: [
@@ -53,8 +58,8 @@ export class VeiculosService {
   }
 
   async findOne(id: string) {
-    const veiculo = await this.prisma.veiculo.findUnique({
-      where: { id },
+    const veiculo = await this.prisma.veiculo.findFirst({
+      where: { id, empresaId: this.tenant.empresaId },
       select: {
         id: true,
         placa: true,
@@ -110,6 +115,7 @@ export class VeiculosService {
         ano: dto.ano,
         modeloId: dto.modeloId,
         clienteId: dto.clienteId,
+        empresaId: this.tenant.empresaId,
       },
       select: {
         id: true,
@@ -179,8 +185,8 @@ export class VeiculosService {
   }
 
   async remove(id: string) {
-    const veiculo = await this.prisma.veiculo.findUnique({
-      where: { id },
+    const veiculo = await this.prisma.veiculo.findFirst({
+      where: { id, empresaId: this.tenant.empresaId },
       include: {
         _count: {
           select: {

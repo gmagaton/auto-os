@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../prisma/prisma.service';
+import { TenantService } from '../tenant/tenant.service';
 import { StatusOS } from '../../../generated/prisma/enums';
 import { EmailService, OrdemEmailData } from '../email/email.service';
 import { CreateOrdemDto } from './dto/create-ordem.dto';
@@ -20,6 +21,7 @@ export class OrdensService {
     private prisma: PrismaService,
     private emailService: EmailService,
     private configService: ConfigService,
+    private tenant: TenantService,
   ) {
     this.frontendUrl = this.configService.get('FRONTEND_URL', 'http://localhost:4200');
   }
@@ -46,6 +48,7 @@ export class OrdensService {
     statusDe: StatusOS | null,
     statusPara: StatusOS,
     usuarioId: string | null,
+    empresaId: string,
   ): Promise<void> {
     await this.prisma.historicoStatus.create({
       data: {
@@ -53,6 +56,7 @@ export class OrdensService {
         statusDe,
         statusPara,
         usuarioId,
+        empresaId,
       },
     });
   }
@@ -60,7 +64,9 @@ export class OrdensService {
   async findAll(filtros: FiltroOrdensDto) {
     const { status, inicio, fim, clienteId, placa, page = 1, limit = 20 } = filtros;
 
-    const where: any = {};
+    const where: any = {
+      empresaId: this.tenant.empresaId,
+    };
 
     if (status && status.length > 0) {
       where.status = { in: status };
@@ -171,8 +177,8 @@ export class OrdensService {
   }
 
   async findOne(id: string) {
-    const ordem = await this.prisma.ordemServico.findUnique({
-      where: { id },
+    const ordem = await this.prisma.ordemServico.findFirst({
+      where: { id, empresaId: this.tenant.empresaId },
       select: {
         id: true,
         token: true,
@@ -256,6 +262,7 @@ export class OrdensService {
 
     return this.prisma.ordemServico.findMany({
       where: {
+        empresaId: this.tenant.empresaId,
         dataAgendada: {
           gte: dataInicio,
           lte: dataFim,
@@ -382,6 +389,7 @@ export class OrdensService {
         usuarioId,
         valorTotal: (valorTotal),
         dataAgendada: dto.dataAgendada ? new Date(dto.dataAgendada) : null,
+        empresaId: this.tenant.empresaId,
         itens: {
           create: dto.itens.map((item) => ({
             servicoId: item.servicoId,
@@ -444,7 +452,7 @@ export class OrdensService {
     });
 
     // Registrar histórico de criação
-    await this.registrarHistorico(ordem.id, null, 'AGUARDANDO', usuarioId);
+    await this.registrarHistorico(ordem.id, null, 'AGUARDANDO', usuarioId, this.tenant.empresaId);
 
     // Enviar email de orcamento
     const emailData = this.getEmailData(ordem);
@@ -548,7 +556,7 @@ export class OrdensService {
 
       // Registrar histórico se status mudou
       if (dto.status && dto.status !== ordemAtual.status) {
-        await this.registrarHistorico(id, ordemAtual.status as StatusOS, dto.status as StatusOS, usuarioId);
+        await this.registrarHistorico(id, ordemAtual.status as StatusOS, dto.status as StatusOS, usuarioId, this.tenant.empresaId);
       }
 
       return ordem;
@@ -626,7 +634,7 @@ export class OrdensService {
 
     // Registrar histórico se status mudou
     if (dto.status && dto.status !== ordemAtual.status) {
-      await this.registrarHistorico(id, ordemAtual.status as StatusOS, dto.status as StatusOS, usuarioId);
+      await this.registrarHistorico(id, ordemAtual.status as StatusOS, dto.status as StatusOS, usuarioId, this.tenant.empresaId);
     }
 
     // Enviar email de finalizacao se status mudou para FINALIZADO
@@ -656,6 +664,7 @@ export class OrdensService {
         url: dto.url,
         tipo: dto.tipo,
         ordemId,
+        empresaId: this.tenant.empresaId,
       },
       select: {
         id: true,
@@ -667,8 +676,8 @@ export class OrdensService {
   }
 
   async removeFoto(fotoId: string) {
-    const foto = await this.prisma.foto.findUnique({
-      where: { id: fotoId },
+    const foto = await this.prisma.foto.findFirst({
+      where: { id: fotoId, empresaId: this.tenant.empresaId },
     });
 
     if (!foto) {
@@ -681,8 +690,11 @@ export class OrdensService {
   }
 
   async getHistorico(ordemId: string) {
+    // Validate that the ordem belongs to this tenant
+    await this.findOne(ordemId);
+
     return this.prisma.historicoStatus.findMany({
-      where: { ordemId },
+      where: { ordemId, empresaId: this.tenant.empresaId },
       include: {
         usuario: {
           select: { id: true, nome: true },
@@ -727,7 +739,7 @@ export class OrdensService {
     });
 
     // Registrar histórico (usuarioId = null indica aprovação pelo cliente)
-    await this.registrarHistorico(ordem.id, 'AGUARDANDO', 'APROVADO', null);
+    await this.registrarHistorico(ordem.id, 'AGUARDANDO', 'APROVADO', null, ordemCheck.empresaId);
 
     // Enviar email de aprovacao
     const emailData = this.getEmailData(ordem);

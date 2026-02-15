@@ -4,24 +4,31 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { TenantService } from '../tenant/tenant.service';
 import { CreateClienteDto } from './dto/create-cliente.dto';
 import { UpdateClienteDto } from './dto/update-cliente.dto';
 
 @Injectable()
 export class ClientesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private tenant: TenantService,
+  ) {}
 
   async findAll(busca?: string) {
     return this.prisma.cliente.findMany({
-      where: busca
-        ? {
-            OR: [
-              { nome: { contains: busca, mode: 'insensitive' } },
-              { telefone: { contains: busca, mode: 'insensitive' } },
-              { email: { contains: busca, mode: 'insensitive' } },
-            ],
-          }
-        : undefined,
+      where: {
+        empresaId: this.tenant.empresaId,
+        ...(busca
+          ? {
+              OR: [
+                { nome: { contains: busca, mode: 'insensitive' } },
+                { telefone: { contains: busca, mode: 'insensitive' } },
+                { email: { contains: busca, mode: 'insensitive' } },
+              ],
+            }
+          : {}),
+      },
       select: {
         id: true,
         nome: true,
@@ -40,8 +47,8 @@ export class ClientesService {
   }
 
   async findOne(id: string) {
-    const cliente = await this.prisma.cliente.findUnique({
-      where: { id },
+    const cliente = await this.prisma.cliente.findFirst({
+      where: { id, empresaId: this.tenant.empresaId },
       select: {
         id: true,
         nome: true,
@@ -86,6 +93,7 @@ export class ClientesService {
         telefone: dto.telefone,
         email: dto.email,
         documento: dto.documento,
+        empresaId: this.tenant.empresaId,
       },
       select: {
         id: true,
@@ -116,8 +124,8 @@ export class ClientesService {
   }
 
   async remove(id: string) {
-    const cliente = await this.prisma.cliente.findUnique({
-      where: { id },
+    const cliente = await this.prisma.cliente.findFirst({
+      where: { id, empresaId: this.tenant.empresaId },
       include: {
         _count: {
           select: {
