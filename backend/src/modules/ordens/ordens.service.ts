@@ -40,6 +40,7 @@ export class OrdensService {
         nome: i.servico.nome,
         valor: Number(i.valor),
       })) || [],
+      empresaNome: ordem.empresa?.nome,
     };
   }
 
@@ -317,6 +318,14 @@ export class OrdensService {
         aprovadoEm: true,
         criadoEm: true,
         atualizadoEm: true,
+        empresa: {
+          select: {
+            nome: true,
+            logoUrl: true,
+            telefone: true,
+            endereco: true,
+          },
+        },
         veiculo: {
           select: {
             id: true,
@@ -448,6 +457,9 @@ export class OrdensService {
             },
           },
         },
+        empresa: {
+          select: { nome: true },
+        },
       },
     });
 
@@ -551,6 +563,9 @@ export class OrdensService {
               criadoEm: true,
             },
           },
+          empresa: {
+            select: { nome: true },
+          },
         },
       });
 
@@ -628,6 +643,9 @@ export class OrdensService {
             tipo: true,
             criadoEm: true,
           },
+        },
+        empresa: {
+          select: { nome: true },
         },
       },
     });
@@ -735,6 +753,7 @@ export class OrdensService {
           },
         },
         itens: { include: { servico: true } },
+        empresa: { select: { nome: true } },
       },
     });
 

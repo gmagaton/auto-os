@@ -10,6 +10,7 @@ export interface OrdemEmailData {
   valorTotal: number;
   portalLink: string;
   itens: Array<{ nome: string; valor: number }>;
+  empresaNome?: string;
 }
 
 @Injectable()
@@ -27,7 +28,7 @@ export class EmailService {
     try {
       await this.mailerService.sendMail({
         to: data.clienteEmail,
-        subject: `Orcamento para ${data.veiculoPlaca} - AutoOS`,
+        subject: `Orcamento para ${data.veiculoPlaca} - ${data.empresaNome || 'AutoOS'}`,
         template: 'orcamento',
         context: {
           clienteNome: data.clienteNome,
@@ -51,7 +52,7 @@ export class EmailService {
     try {
       await this.mailerService.sendMail({
         to: data.clienteEmail,
-        subject: `Orcamento Aprovado - ${data.veiculoPlaca} - AutoOS`,
+        subject: `Orcamento Aprovado - ${data.veiculoPlaca} - ${data.empresaNome || 'AutoOS'}`,
         template: 'aprovado',
         context: {
           clienteNome: data.clienteNome,
@@ -70,7 +71,7 @@ export class EmailService {
     try {
       await this.mailerService.sendMail({
         to: data.clienteEmail,
-        subject: `Servico Finalizado - ${data.veiculoPlaca} - AutoOS`,
+        subject: `Servico Finalizado - ${data.veiculoPlaca} - ${data.empresaNome || 'AutoOS'}`,
         template: 'finalizado',
         context: {
           clienteNome: data.clienteNome,
