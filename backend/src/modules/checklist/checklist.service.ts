@@ -163,13 +163,34 @@ export class ChecklistService {
   async getChecklistByOrdemToken(token: string) {
     const ordem = await this.prisma.ordemServico.findUnique({
       where: { token },
-      select: { id: true },
+      select: { id: true, empresaId: true },
     });
 
     if (!ordem) {
       throw new NotFoundException('Ordem nao encontrada');
     }
 
-    return this.getChecklistByOrdem(ordem.id);
+    // Portal (public) path: resolve empresaId from the order itself
+    const itens = await this.prisma.itemChecklist.findMany({
+      where: { ativo: true },
+      orderBy: [{ categoria: 'asc' }, { ordem: 'asc' }],
+    });
+
+    const preenchidos = await this.prisma.checklistPreenchido.findMany({
+      where: { ordemId: ordem.id, empresaId: ordem.empresaId },
+      include: {
+        item: true,
+        usuario: {
+          select: { id: true, nome: true },
+        },
+      },
+    });
+
+    const preenchidosMap = new Map(preenchidos.map((p) => [p.itemId, p]));
+
+    return itens.map((item) => ({
+      item,
+      preenchido: preenchidosMap.get(item.id) || null,
+    }));
   }
 }
