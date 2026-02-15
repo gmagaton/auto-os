@@ -22,9 +22,6 @@ CREATE TABLE "Empresa" (
 -- CreateIndex
 CREATE UNIQUE INDEX "Empresa_slug_key" ON "Empresa"("slug");
 
--- AlterEnum: Add SUPERADMIN to Papel
-ALTER TYPE "Papel" ADD VALUE 'SUPERADMIN';
-
 -- InsertDefaultEmpresa
 INSERT INTO "Empresa" ("id", "nome", "slug", "status", "criadoEm", "atualizadoEm")
 VALUES ('default-empresa', 'Oficina Padrao', 'oficina-padrao', 'ATIVA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
