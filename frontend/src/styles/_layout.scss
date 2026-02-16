@@ -19,7 +19,8 @@
 .content,
 .main-content {
   padding: $spacing-lg $spacing-xl;
-  min-height: calc(100vh - 64px);
+  flex: 1;
+  overflow-y: auto;
   background-color: $background-default;
 
   @include mobile {
@@ -49,6 +50,8 @@ mat-sidenav {
 mat-sidenav-content {
   background-color: $background-default;
   overflow-x: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
 // Sidenav Header
@@ -114,10 +117,13 @@ mat-nav-list {
 // TOOLBAR / HEADER
 // ===========================================
 
-mat-toolbar {
-  position: sticky;
-  top: 0;
+app-header,
+mat-sidenav-content > mat-toolbar {
+  flex-shrink: 0;
   z-index: $z-index-sticky;
+}
+
+mat-toolbar {
   box-shadow: $shadow-sm;
   min-height: $toolbar-height !important;
 
