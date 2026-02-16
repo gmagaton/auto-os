@@ -27,6 +27,11 @@ export const routes: Routes = [
     loadChildren: () => import('./features/admin/admin.routes').then(m => m.adminRoutes),
   },
   {
+    path: ':slug/login',
+    loadComponent: () =>
+      import('./features/login/login.component').then((m) => m.LoginComponent),
+  },
+  {
     path: ':slug',
     component: LayoutComponent,
     canActivate: [tenantGuard],

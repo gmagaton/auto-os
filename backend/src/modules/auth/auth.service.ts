@@ -13,7 +13,10 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const usuario = await this.prisma.usuario.findFirst({
-      where: { email: dto.email },
+      where: {
+        email: dto.email,
+        ...(dto.slug ? { empresa: { slug: dto.slug } } : {}),
+      },
       include: {
         empresa: {
           select: {

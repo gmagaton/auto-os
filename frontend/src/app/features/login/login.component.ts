@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -27,16 +27,22 @@ export class LoginComponent {
   senha = '';
   loading = false;
   error = '';
+  slug: string | null = null;
 
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private tenantService = inject(TenantService);
+
+  constructor() {
+    this.slug = this.route.snapshot.paramMap.get('slug');
+  }
 
   login() {
     this.loading = true;
     this.error = '';
 
-    this.authService.login(this.email, this.senha).subscribe({
+    this.authService.login(this.email, this.senha, this.slug ?? undefined).subscribe({
       next: () => {
         if (this.authService.isSuperAdmin()) {
           this.router.navigate(['/admin']);

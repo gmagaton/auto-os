@@ -100,8 +100,8 @@ export class AuthService {
     return true;
   }
 
-  login(email: string, senha: string): Observable<LoginResponse> {
-    return this.api.post<LoginResponse>('auth/login', { email, senha }).pipe(
+  login(email: string, senha: string, slug?: string): Observable<LoginResponse> {
+    return this.api.post<LoginResponse>('auth/login', { email, senha, slug }).pipe(
       tap((response) => {
         const isSuperAdmin = response.usuario.papel === 'SUPERADMIN';
         const slug = isSuperAdmin ? ADMIN_SLUG : response.empresa?.slug;
