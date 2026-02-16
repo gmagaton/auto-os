@@ -102,25 +102,30 @@ export class AuthService {
 
   login(email: string, senha: string, slug?: string): Observable<LoginResponse> {
     return this.api.post<LoginResponse>('auth/login', { email, senha, slug }).pipe(
-      tap((response) => {
-        const isSuperAdmin = response.usuario.papel === 'SUPERADMIN';
-        const slug = isSuperAdmin ? ADMIN_SLUG : response.empresa?.slug;
-
-        if (!slug || !response.empresa) return;
-
-        const session: Session = {
-          token: response.access_token,
-          usuario: response.usuario,
-          empresa: response.empresa,
-        };
-
-        this.sessionsMap.update((map) => ({ ...map, [slug]: session }));
-        this.saveSessions();
-
-        this.activeSlugSignal.set(slug);
-        this.tenantService.setEmpresa(response.empresa);
-      })
+      tap((response) => this.handleLoginResponse(response))
     );
+  }
+
+  /**
+   * Save session from a LoginResponse (used by login and registro).
+   */
+  handleLoginResponse(response: LoginResponse): void {
+    const isSuperAdmin = response.usuario.papel === 'SUPERADMIN';
+    const slug = isSuperAdmin ? ADMIN_SLUG : response.empresa?.slug;
+
+    if (!slug || !response.empresa) return;
+
+    const session: Session = {
+      token: response.access_token,
+      usuario: response.usuario,
+      empresa: response.empresa,
+    };
+
+    this.sessionsMap.update((map) => ({ ...map, [slug]: session }));
+    this.saveSessions();
+
+    this.activeSlugSignal.set(slug);
+    this.tenantService.setEmpresa(response.empresa);
   }
 
   /**

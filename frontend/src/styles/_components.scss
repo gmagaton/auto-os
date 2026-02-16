@@ -684,6 +684,11 @@
     color: $primary-color;
     line-height: 1;
     margin-bottom: $spacing-xs;
+
+    &.color-success { color: $success-color; }
+    &.color-info { color: $info-color; }
+    &.color-danger { color: $error-color; }
+    &.color-primary { color: $primary-color; }
   }
 
   .stat-label {
@@ -3905,70 +3910,233 @@ ngx-charts-legend {
 // LANDING PAGE
 // ===========================================
 
-.landing-hero {
-  @include flex-center;
-  min-height: 80vh;
-  padding: $spacing-xxl $spacing-md;
-  background: linear-gradient(135deg, $primary-dark 0%, $primary-color 50%, $primary-light 100%);
-  text-align: center;
-  color: $text-inverse;
+// --- Navbar ---
+.landing-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: $z-index-sticky;
+  background: rgba($background-paper, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid $border-light;
 }
 
-.landing-hero-content {
-  @include flex-column-center;
-  max-width: 700px;
-
-  h1 {
-    font-size: 2.5rem;
-    font-weight: $font-weight-bold;
-    line-height: $line-height-tight;
-    margin: $spacing-lg 0 $spacing-md;
-  }
-
-  p {
-    font-size: $font-size-lg;
-    opacity: 0.9;
-    margin: 0 0 $spacing-xl;
-    line-height: $line-height-relaxed;
-  }
+.landing-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: $spacing-sm $spacing-lg;
 
   @include mobile {
-    h1 {
-      font-size: $font-size-xxxl;
-    }
+    padding: $spacing-sm $spacing-md;
+  }
+}
 
-    p {
-      font-size: $font-size-base;
+.landing-nav-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+
+  img {
+    height: 40px;
+    width: auto;
+
+    @include mobile {
+      height: 34px;
     }
+  }
+}
+
+.landing-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.landing-nav-login {
+  color: $text-primary !important;
+  font-weight: $font-weight-medium !important;
+}
+
+.landing-nav-signup {
+  background: $primary-color !important;
+  color: $text-inverse !important;
+  font-weight: $font-weight-semibold !important;
+  border-radius: $border-radius-md !important;
+}
+
+// --- Hero ---
+.landing-hero {
+  @include flex-center;
+  min-height: 0;
+  padding: 88px $spacing-lg $spacing-xxl;
+  background: $primary-dark;
+  text-align: center;
+
+  @include mobile {
+    padding: 80px $spacing-md $spacing-xxl;
   }
 }
 
 .landing-hero-logo {
-  max-width: 220px;
+  width: 140px;
   height: auto;
+  margin-bottom: $spacing-sm;
 
   @include mobile {
-    max-width: 160px;
+    width: 80px;
   }
 }
 
-.landing-hero-cta {
-  font-size: $font-size-md;
-  padding: $spacing-sm $spacing-xl;
+.landing-hero-content {
+  @include flex-column-center;
+  max-width: 720px;
+
+  h1 {
+    font-size: 2.75rem;
+    font-weight: $font-weight-bold;
+    line-height: 1.15;
+    color: $text-inverse;
+    margin: 0 0 $spacing-md;
+    letter-spacing: -0.5px;
+  }
+
+  > p {
+    font-size: 1.15rem;
+    color: rgba(255, 255, 255, 0.75);
+    margin: 0 0 $spacing-lg;
+    line-height: $line-height-relaxed;
+    max-width: 560px;
+  }
+
+  @include mobile {
+    h1 {
+      font-size: 2rem;
+    }
+
+    > p {
+      font-size: $font-size-md;
+    }
+  }
+}
+
+.landing-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-xs $spacing-md;
+  background: rgba(255, 255, 255, 0.12);
+  color: $accent-light;
+  border-radius: $border-radius-full;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  margin-bottom: $spacing-lg;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.landing-hero-buttons {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+
+  @include mobile {
+    flex-direction: column;
+    width: 100%;
+
+    a {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+.landing-btn-primary {
   background: $accent-color !important;
   color: $text-inverse !important;
-  border-radius: $border-radius-md;
-  font-weight: $font-weight-semibold;
+  font-weight: $font-weight-semibold !important;
+  font-size: $font-size-md !important;
+  padding: $spacing-sm $spacing-xl !important;
+  border-radius: $border-radius-md !important;
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  box-shadow: 0 4px 14px rgba($accent-color, 0.3);
+  transition: all $transition-fast;
 
   &:hover {
     background: $accent-dark !important;
+    box-shadow: 0 6px 20px rgba($accent-color, 0.4);
+    transform: translateY(-1px);
+  }
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
   }
 }
 
-// Sections
+.landing-btn-lg {
+  padding: $spacing-md $spacing-xl !important;
+  font-size: $font-size-lg !important;
+}
+
+.landing-btn-secondary {
+  color: $text-inverse !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
+  font-weight: $font-weight-medium !important;
+  font-size: $font-size-md !important;
+  padding: $spacing-sm $spacing-xl !important;
+  border-radius: $border-radius-md !important;
+  text-decoration: none;
+  background: transparent !important;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.6) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+  }
+}
+
+.landing-hero-trust {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+
+  @include mobile {
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+}
+
+.landing-trust-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: $font-size-sm;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: $success-light;
+  }
+}
+
+// --- Sections ---
 .landing-section {
-  padding: $spacing-xxxl $spacing-md;
+  padding: $spacing-xxl $spacing-lg;
   max-width: 1100px;
   margin: 0 auto;
 
@@ -3981,6 +4149,13 @@ ngx-charts-legend {
   max-width: 100%;
   background: $background-default;
 
+  .landing-section-title,
+  .landing-section-subtitle {
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   .landing-steps {
     max-width: 1100px;
     margin: 0 auto;
@@ -3989,39 +4164,56 @@ ngx-charts-legend {
 
 .landing-section-title {
   text-align: center;
-  font-size: $font-size-xxl;
+  font-size: 2rem;
   font-weight: $font-weight-bold;
-  color: $primary-color;
+  color: $primary-dark;
   margin: 0 0 $spacing-sm;
+
+  @include mobile {
+    font-size: $font-size-xxl;
+  }
 }
 
 .landing-section-subtitle {
   text-align: center;
   color: $text-secondary;
-  font-size: $font-size-md;
-  margin: 0 0 $spacing-xxl;
+  font-size: $font-size-lg;
+  margin: 0 0 $spacing-xl;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+
+  @include mobile {
+    font-size: $font-size-base;
+  }
 }
 
-// Features Grid
+// --- Features Grid ---
 .landing-features-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: $spacing-lg;
 
-  @include mobile-tablet {
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
     grid-template-columns: 1fr;
   }
 }
 
 .landing-feature-card {
   @include card;
-  padding: $spacing-lg;
+  padding: $spacing-xl $spacing-lg;
   text-align: center;
-  transition: box-shadow $transition-fast, transform $transition-fast;
+  transition: box-shadow $transition-normal, transform $transition-normal;
+  border: 1px solid transparent;
 
   &:hover {
-    box-shadow: $shadow-md;
+    box-shadow: $shadow-lg;
     transform: translateY(-4px);
+    border-color: $border-light;
   }
 
   h3 {
@@ -4041,9 +4233,9 @@ ngx-charts-legend {
 
 .landing-feature-icon {
   @include flex-center;
-  width: 56px;
-  height: 56px;
-  border-radius: $border-radius-lg;
+  width: 60px;
+  height: 60px;
+  border-radius: $border-radius-xl;
   margin: 0 auto;
 
   mat-icon {
@@ -4083,20 +4275,26 @@ ngx-charts-legend {
   }
 }
 
-// Steps
+// --- Steps ---
 .landing-steps {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: $spacing-lg;
 
-  @include mobile-tablet {
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
     grid-template-columns: 1fr;
+    gap: $spacing-md;
   }
 }
 
 .landing-step {
   text-align: center;
   padding: $spacing-lg;
+  position: relative;
 
   h3 {
     font-size: $font-size-md;
@@ -4116,74 +4314,207 @@ ngx-charts-legend {
 .landing-step-number {
   @include flex-center;
   display: inline-flex;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: $border-radius-full;
   background: $primary-color;
   color: $text-inverse;
   font-size: $font-size-lg;
   font-weight: $font-weight-bold;
+  position: relative;
+  z-index: 1;
 }
 
-// Portal Highlight
-.landing-portal-highlight {
-  max-width: 100%;
-  background: linear-gradient(135deg, $primary-dark, $primary-color);
-  padding: $spacing-xxxl $spacing-md;
+.landing-step-connector {
+  display: none;
+
+  @media (min-width: $breakpoint-md) {
+    display: block;
+    position: absolute;
+    top: 54px;
+    left: calc(50% + 30px);
+    width: calc(100% - 60px);
+    height: 2px;
+    background: $border-color;
+
+    .landing-step:last-child & {
+      display: none;
+    }
+  }
 }
 
-.landing-portal-content {
-  @include flex-column-center;
-  max-width: 700px;
-  margin: 0 auto;
-  text-align: center;
-  color: $text-inverse;
+// --- Benefits ---
+.landing-benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-lg;
 
-  h2 {
-    font-size: $font-size-xxl;
-    font-weight: $font-weight-bold;
-    margin: $spacing-md 0 $spacing-md;
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.landing-benefit {
+  display: flex;
+  gap: $spacing-md;
+  padding: $spacing-lg;
+  background: $background-paper;
+  border-radius: $border-radius-lg;
+  border: 1px solid $border-light;
+  transition: box-shadow $transition-fast;
+
+  &:hover {
+    box-shadow: $shadow-sm;
+  }
+
+  > mat-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    font-size: 40px;
+    color: $primary-color;
+  }
+
+  h4 {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    margin: 0 0 $spacing-xs;
   }
 
   p {
-    font-size: $font-size-md;
-    opacity: 0.9;
+    font-size: $font-size-base;
+    color: $text-secondary;
+    line-height: $line-height-relaxed;
+    margin: 0;
+  }
+}
+
+// --- CTA Final ---
+.landing-cta {
+  background: $primary-dark;
+  padding: $spacing-xxl $spacing-lg;
+  position: relative;
+  overflow: hidden;
+
+  // Detalhe decorativo sutil
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: rgba($primary-light, 0.08);
+    pointer-events: none;
+  }
+
+  @include mobile {
+    padding: $spacing-xxl $spacing-md;
+  }
+}
+
+.landing-cta-content {
+  @include flex-column-center;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  color: $text-inverse;
+  position: relative;
+
+  h2 {
+    font-size: 2rem;
+    font-weight: $font-weight-bold;
+    margin: 0 0 $spacing-md;
+
+    @include mobile {
+      font-size: $font-size-xxl;
+    }
+  }
+
+  p {
+    font-size: $font-size-lg;
+    opacity: 0.85;
     line-height: $line-height-relaxed;
     margin: 0 0 $spacing-xl;
+
+    @include mobile {
+      font-size: $font-size-md;
+    }
   }
 }
 
-.landing-portal-icon {
-  font-size: 48px !important;
-  width: 48px !important;
-  height: 48px !important;
-  opacity: 0.9;
-}
-
-.landing-portal-cta {
-  background: $accent-color !important;
-  color: $text-inverse !important;
-  font-weight: $font-weight-semibold;
-  padding: $spacing-sm $spacing-xl;
-  border-radius: $border-radius-md;
-  text-decoration: none;
-
-  &:hover {
-    background: $accent-dark !important;
-  }
-}
-
-// Footer
+// --- Footer ---
 .landing-footer {
-  text-align: center;
-  padding: $spacing-lg $spacing-md;
-  background: $text-primary;
-  color: $text-inverse;
+  background: $background-default;
+  border-top: 1px solid $border-light;
+  padding: 0;
+}
+
+.landing-footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: $spacing-xl $spacing-lg;
+
+  @include mobile {
+    flex-direction: column;
+    gap: $spacing-lg;
+    text-align: center;
+    padding: $spacing-xl $spacing-md;
+  }
+}
+
+.landing-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
 
   p {
     margin: 0;
     font-size: $font-size-sm;
-    opacity: 0.7;
+    color: $text-secondary;
+  }
+
+  @include mobile {
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+}
+
+.landing-footer-logo {
+  height: 36px;
+  width: auto;
+}
+
+.landing-footer-links {
+  display: flex;
+  gap: $spacing-lg;
+
+  a {
+    color: $text-secondary;
+    text-decoration: none;
+    font-size: $font-size-sm;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: $primary-color;
+    }
+  }
+}
+
+.landing-footer-bottom {
+  border-top: 1px solid $border-light;
+  padding: $spacing-md $spacing-lg;
+  text-align: center;
+
+  p {
+    margin: 0;
+    font-size: $font-size-xs;
+    color: $text-disabled;
   }
 }
 

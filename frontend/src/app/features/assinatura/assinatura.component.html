@@ -1,0 +1,71 @@
+<div class="list-header">
+  <h1>Assinatura</h1>
+</div>
+
+@if (loading()) {
+  <div class="loading">
+    <mat-spinner diameter="40" />
+  </div>
+} @else {
+  <!-- Plano Atual -->
+  <div class="detail-card">
+    <div class="info-section">
+      <h3><mat-icon>card_membership</mat-icon> Plano Atual</h3>
+      @if (assinatura(); as a) {
+        <div class="info-list">
+          <div class="info-row">
+            <span class="label">Plano</span>
+            <span class="value"><strong>{{ a.plano.nome }}</strong></span>
+          </div>
+          <div class="info-row">
+            <span class="label">Status</span>
+            <span class="value">
+              <span class="status-badge" [class]="'status-' + a.status.toLowerCase()">{{ a.status }}</span>
+            </span>
+          </div>
+          <div class="info-row">
+            <span class="label">Vencimento</span>
+            <span class="value">{{ a.dataFim | date:'dd/MM/yyyy' }}</span>
+          </div>
+          @if (a.plano.maxUsuarios) {
+            <div class="info-row">
+              <span class="label">Max. Usuarios</span>
+              <span class="value">{{ a.plano.maxUsuarios }}</span>
+            </div>
+          }
+          <div class="info-row">
+            <span class="label">Preco</span>
+            <span class="value">{{ a.plano.preco | currency:'BRL':'symbol':'1.2-2' }}/mes</span>
+          </div>
+        </div>
+      } @else {
+        <p class="empty-text">Nenhuma assinatura ativa.</p>
+      }
+    </div>
+  </div>
+
+  <!-- Planos Disponiveis -->
+  <div class="detail-card">
+    <div class="info-section">
+      <h3><mat-icon>storefront</mat-icon> Planos Disponiveis</h3>
+      <div class="planos-grid">
+        @for (p of planos(); track p.id) {
+          <div class="plano-card" [class.plano-atual]="assinatura()?.plano?.id === p.id">
+            <h4>{{ p.nome }}</h4>
+            <div class="plano-preco">{{ p.preco | currency:'BRL':'symbol':'1.2-2' }}<span>/mes</span></div>
+            @if (p.maxUsuarios) {
+              <p class="plano-detalhe">Ate {{ p.maxUsuarios }} usuarios</p>
+            } @else {
+              <p class="plano-detalhe">Usuarios ilimitados</p>
+            }
+            @if (assinatura()?.plano?.id === p.id) {
+              <button mat-stroked-button disabled>Plano Atual</button>
+            } @else {
+              <button mat-raised-button color="primary" (click)="selecionarPlano(p)">Selecionar</button>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

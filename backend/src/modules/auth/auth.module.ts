@@ -5,6 +5,8 @@ import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { AssinaturasModule } from '../assinaturas/assinaturas.module';
+import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
         };
       },
     }),
+    AssinaturasModule,
+    EmailModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

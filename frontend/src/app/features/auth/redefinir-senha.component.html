@@ -1,0 +1,53 @@
+<div class="login-container">
+  <mat-card class="login-card">
+    <div class="login-logo">
+      <img src="assets/branding/logo-horizontal.png" alt="AutoOS" class="logo-img" />
+    </div>
+    <h2 style="text-align: center; margin-bottom: 16px;">Redefinir senha</h2>
+    <mat-card-content>
+      @if (sucesso) {
+        <p style="text-align: center; margin-bottom: 16px;">
+          Senha redefinida com sucesso!
+        </p>
+        <button
+          mat-raised-button
+          color="primary"
+          class="full-width login-btn"
+          (click)="irParaLogin()"
+        >
+          Ir para o login
+        </button>
+      } @else {
+        <form (ngSubmit)="redefinir()" class="login-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nova senha</mat-label>
+            <input matInput type="password" [(ngModel)]="novaSenha" name="novaSenha" required minlength="6" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Confirmar senha</mat-label>
+            <input matInput type="password" [(ngModel)]="confirmarSenha" name="confirmarSenha" required minlength="6" />
+          </mat-form-field>
+
+          @if (error) {
+            <div class="login-error">{{ error }}</div>
+          }
+
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            class="full-width login-btn"
+            [disabled]="loading"
+          >
+            @if (loading) {
+              <mat-spinner diameter="20"></mat-spinner>
+            } @else {
+              Redefinir senha
+            }
+          </button>
+        </form>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

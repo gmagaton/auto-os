@@ -1,131 +1,222 @@
+<!-- Navbar -->
+<nav class="landing-nav">
+  <div class="landing-nav-inner">
+    <a routerLink="/" class="landing-nav-logo">
+      <img src="assets/branding/logo-horizontal-sm.png" alt="Auto OS" />
+    </a>
+    <div class="landing-nav-actions">
+      <a mat-button routerLink="/login" class="landing-nav-login">Entrar</a>
+      <a mat-raised-button routerLink="/cadastro" class="landing-nav-signup">Criar conta</a>
+    </div>
+  </div>
+</nav>
+
 <!-- Hero -->
 <section class="landing-hero">
   <div class="landing-hero-content">
-    <img src="assets/branding/logo-dark.png" alt="Auto OS" class="landing-hero-logo" />
-    <h1>Gestão inteligente para sua oficina</h1>
-    <p>Controle ordens de serviço, agendamentos e o relacionamento com seus clientes em um só lugar.</p>
-    <a mat-raised-button color="primary" routerLink="/login" class="landing-hero-cta">
-      Acessar Sistema
-    </a>
+    <img src="assets/branding/logo-icon.png" alt="Auto OS" class="landing-hero-logo" />
+    <span class="landing-hero-badge">
+      <mat-icon>rocket_launch</mat-icon>
+      14 dias gratis — sem cartao de credito
+    </span>
+    <h1>Gestao completa para sua oficina mecanica</h1>
+    <p>
+      Orcamentos, agendamentos, portal do cliente e controle financeiro.
+      Tudo em um so lugar para voce focar no que importa: atender bem.
+    </p>
+    <div class="landing-hero-buttons">
+      <a mat-raised-button routerLink="/cadastro" class="landing-btn-primary">
+        Comece gratis agora
+        <mat-icon>arrow_forward</mat-icon>
+      </a>
+      <a mat-stroked-button routerLink="/login" class="landing-btn-secondary">
+        Ja tenho conta
+      </a>
+    </div>
+    <div class="landing-hero-trust">
+      <div class="landing-trust-item">
+        <mat-icon>check_circle</mat-icon>
+        <span>Setup em 2 minutos</span>
+      </div>
+      <div class="landing-trust-item">
+        <mat-icon>check_circle</mat-icon>
+        <span>Sem instalacao</span>
+      </div>
+      <div class="landing-trust-item">
+        <mat-icon>check_circle</mat-icon>
+        <span>Suporte incluso</span>
+      </div>
+    </div>
   </div>
 </section>
 
 <!-- Funcionalidades -->
 <section class="landing-section">
-  <h2 class="landing-section-title">Funcionalidades</h2>
-  <p class="landing-section-subtitle">Tudo que sua oficina precisa para operar com eficiência</p>
+  <h2 class="landing-section-title">Tudo que sua oficina precisa</h2>
+  <p class="landing-section-subtitle">Funcionalidades pensadas para o dia a dia de oficinas mecanicas e centros automotivos</p>
 
   <div class="landing-features-grid">
     <div class="landing-feature-card">
       <div class="landing-feature-icon landing-feature-icon--blue">
         <mat-icon>request_quote</mat-icon>
       </div>
-      <h3>Orçamentos</h3>
-      <p>Crie orçamentos detalhados com serviços e peças, e envie para aprovação do cliente.</p>
+      <h3>Orcamentos profissionais</h3>
+      <p>Crie orcamentos detalhados com servicos e pecas. Envie por WhatsApp para aprovacao do cliente.</p>
     </div>
 
     <div class="landing-feature-card">
       <div class="landing-feature-icon landing-feature-icon--orange">
         <mat-icon>calendar_month</mat-icon>
       </div>
-      <h3>Agenda</h3>
-      <p>Gerencie agendamentos da oficina com visualização por dia, semana ou mês.</p>
+      <h3>Agenda integrada</h3>
+      <p>Gerencie agendamentos com visualizacao por dia, semana ou mes. Nunca perca um servico.</p>
     </div>
 
     <div class="landing-feature-card">
       <div class="landing-feature-icon landing-feature-icon--green">
-        <mat-icon>link</mat-icon>
+        <mat-icon>phone_iphone</mat-icon>
       </div>
-      <h3>Portal do Cliente</h3>
-      <p>Seu cliente acompanha o serviço em tempo real por um link exclusivo, sem precisar de login.</p>
+      <h3>Portal do cliente</h3>
+      <p>Seu cliente acompanha o servico pelo celular com fotos e atualizacoes em tempo real.</p>
     </div>
 
     <div class="landing-feature-card">
       <div class="landing-feature-icon landing-feature-icon--purple">
         <mat-icon>checklist</mat-icon>
       </div>
-      <h3>Checklist</h3>
-      <p>Registre a entrada do veículo com checklists customizáveis e fotos.</p>
+      <h3>Checklist de entrada</h3>
+      <p>Registre a condicao do veiculo na entrada com checklists personalizaveis e fotos.</p>
     </div>
 
     <div class="landing-feature-card">
       <div class="landing-feature-icon landing-feature-icon--red">
         <mat-icon>photo_camera</mat-icon>
       </div>
-      <h3>Fotos</h3>
-      <p>Anexe fotos do veículo em cada etapa do serviço para transparência total.</p>
+      <h3>Registro fotografico</h3>
+      <p>Documente cada etapa do servico com fotos. Transparencia total para voce e seu cliente.</p>
     </div>
 
     <div class="landing-feature-card">
       <div class="landing-feature-icon landing-feature-icon--teal">
-        <mat-icon>dashboard</mat-icon>
+        <mat-icon>insights</mat-icon>
       </div>
-      <h3>Dashboard</h3>
-      <p>Acompanhe indicadores da oficina: faturamento, ordens em andamento e mais.</p>
+      <h3>Dashboard e relatorios</h3>
+      <p>Acompanhe faturamento, ordens em andamento e indicadores de desempenho da oficina.</p>
     </div>
   </div>
 </section>
 
 <!-- Como Funciona -->
 <section class="landing-section landing-section--alt">
-  <h2 class="landing-section-title">Como Funciona</h2>
-  <p class="landing-section-subtitle">Do orçamento à entrega em 6 passos simples</p>
+  <h2 class="landing-section-title">Simples de usar</h2>
+  <p class="landing-section-subtitle">Do orcamento a entrega em poucos passos</p>
 
   <div class="landing-steps">
     <div class="landing-step">
       <span class="landing-step-number">1</span>
-      <h3>Cadastro do veículo</h3>
-      <p>Registre o cliente e o veículo no sistema.</p>
+      <div class="landing-step-connector"></div>
+      <h3>Cadastre o veiculo</h3>
+      <p>Registre o cliente e o veiculo no sistema em segundos.</p>
     </div>
 
     <div class="landing-step">
       <span class="landing-step-number">2</span>
-      <h3>Orçamento</h3>
-      <p>Monte o orçamento com serviços e peças necessárias.</p>
+      <div class="landing-step-connector"></div>
+      <h3>Monte o orcamento</h3>
+      <p>Adicione servicos e pecas com valores. Envie ao cliente.</p>
     </div>
 
     <div class="landing-step">
       <span class="landing-step-number">3</span>
-      <h3>Aprovação do cliente</h3>
-      <p>O cliente aprova pelo portal, sem precisar ligar.</p>
+      <div class="landing-step-connector"></div>
+      <h3>Cliente aprova online</h3>
+      <p>O cliente aprova pelo portal, sem precisar ligar ou ir ate a oficina.</p>
     </div>
 
     <div class="landing-step">
       <span class="landing-step-number">4</span>
-      <h3>Agendamento</h3>
-      <p>Agende a execução no melhor horário da oficina.</p>
+      <div class="landing-step-connector"></div>
+      <h3>Agende o servico</h3>
+      <p>Agende a execucao no melhor horario da oficina.</p>
     </div>
 
     <div class="landing-step">
       <span class="landing-step-number">5</span>
-      <h3>Execução</h3>
-      <p>Acompanhe o progresso e registre fotos do serviço.</p>
+      <div class="landing-step-connector"></div>
+      <h3>Execute e registre</h3>
+      <p>Acompanhe o progresso, tire fotos e atualize o status.</p>
     </div>
 
     <div class="landing-step">
       <span class="landing-step-number">6</span>
-      <h3>Finalização</h3>
-      <p>Conclua a ordem e notifique o cliente para retirada.</p>
+      <h3>Entregue o veiculo</h3>
+      <p>Finalize a ordem e notifique o cliente para retirada.</p>
     </div>
   </div>
 </section>
 
-<!-- Portal do Cliente Destaque -->
-<section class="landing-section landing-portal-highlight">
-  <div class="landing-portal-content">
-    <mat-icon class="landing-portal-icon">phone_iphone</mat-icon>
-    <h2>Portal do Cliente</h2>
-    <p>
-      Seu diferencial competitivo: o cliente acompanha cada etapa do serviço pelo celular,
-      com fotos e atualizações em tempo real — tudo por um link simples, sem instalar nada.
-    </p>
-    <a mat-raised-button routerLink="/login" class="landing-portal-cta">
-      Comece agora
+<!-- Diferenciais -->
+<section class="landing-section">
+  <h2 class="landing-section-title">Por que escolher o Auto OS?</h2>
+  <p class="landing-section-subtitle">Feito por quem entende a rotina de uma oficina</p>
+
+  <div class="landing-benefits-grid">
+    <div class="landing-benefit">
+      <mat-icon>speed</mat-icon>
+      <div>
+        <h4>Rapido de configurar</h4>
+        <p>Crie sua conta e comece a usar em menos de 2 minutos. Sem configuracoes complexas.</p>
+      </div>
+    </div>
+    <div class="landing-benefit">
+      <mat-icon>devices</mat-icon>
+      <div>
+        <h4>Funciona em qualquer dispositivo</h4>
+        <p>Acesse do computador, tablet ou celular. Interface otimizada para cada tela.</p>
+      </div>
+    </div>
+    <div class="landing-benefit">
+      <mat-icon>lock</mat-icon>
+      <div>
+        <h4>Seus dados seguros</h4>
+        <p>Infraestrutura em nuvem com backup automatico. Seus dados sempre protegidos.</p>
+      </div>
+    </div>
+    <div class="landing-benefit">
+      <mat-icon>support_agent</mat-icon>
+      <div>
+        <h4>Suporte dedicado</h4>
+        <p>Equipe de suporte pronta para ajudar voce a tirar o maximo da plataforma.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Final -->
+<section class="landing-cta">
+  <div class="landing-cta-content">
+    <h2>Pronto para profissionalizar sua oficina?</h2>
+    <p>Comece hoje com 14 dias gratis. Sem compromisso, sem cartao de credito.</p>
+    <a mat-raised-button routerLink="/cadastro" class="landing-btn-primary landing-btn-lg">
+      Criar minha conta gratis
+      <mat-icon>arrow_forward</mat-icon>
     </a>
   </div>
 </section>
 
 <!-- Footer -->
 <footer class="landing-footer">
-  <p>&copy; {{ currentYear }} Auto OS — Gestão inteligente para oficinas</p>
+  <div class="landing-footer-inner">
+    <div class="landing-footer-brand">
+      <img src="assets/branding/logo-horizontal-sm.png" alt="Auto OS" class="landing-footer-logo" />
+      <p>Gestao inteligente para oficinas mecanicas</p>
+    </div>
+    <div class="landing-footer-links">
+      <a routerLink="/cadastro">Criar conta</a>
+      <a routerLink="/login">Entrar</a>
+    </div>
+  </div>
+  <div class="landing-footer-bottom">
+    <p>&copy; {{ currentYear }} Auto OS. Todos os direitos reservados.</p>
+  </div>
 </footer>

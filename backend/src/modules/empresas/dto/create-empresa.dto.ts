@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsDateString } from 'class-validator';
+import { IsString, IsOptional, IsInt, Min } from 'class-validator';
 
 export class CreateEmpresaDto {
   @IsString()
@@ -22,13 +22,14 @@ export class CreateEmpresaDto {
 
   @IsOptional()
   @IsString()
-  plano?: string;
-
-  @IsOptional()
-  @IsDateString()
-  dataVencimento?: string;
+  logoUrl?: string;
 
   @IsOptional()
   @IsString()
-  logoUrl?: string;
+  planoId?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  meses?: number;
 }

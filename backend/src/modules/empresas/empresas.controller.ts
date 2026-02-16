@@ -17,16 +17,25 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { StatusEmpresa } from '../../../generated/prisma/enums';
+import { AssinaturasService } from '../assinaturas/assinaturas.service';
 
 @Controller('empresas')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('SUPERADMIN')
 export class EmpresasController {
-  constructor(private empresasService: EmpresasService) {}
+  constructor(
+    private empresasService: EmpresasService,
+    private assinaturasService: AssinaturasService,
+  ) {}
 
   @Get()
   findAll(@Query('busca') busca?: string) {
     return this.empresasService.findAll(busca);
+  }
+
+  @Get('dashboard')
+  getDashboardStats() {
+    return this.empresasService.getDashboardStats();
   }
 
   @Get(':id')
@@ -40,8 +49,18 @@ export class EmpresasController {
   }
 
   @Post()
-  create(@Body() dto: CreateEmpresaDto) {
-    return this.empresasService.create(dto);
+  async create(@Body() dto: CreateEmpresaDto) {
+    const empresa = await this.empresasService.create(dto);
+
+    if (dto.planoId) {
+      if (dto.planoId === 'plano-trial') {
+        await this.assinaturasService.criarTrial(empresa.id);
+      } else {
+        await this.assinaturasService.renovar(empresa.id, dto.planoId, dto.meses || 1);
+      }
+    }
+
+    return empresa;
   }
 
   @Put(':id')
@@ -57,5 +76,18 @@ export class EmpresasController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.empresasService.remove(id);
+  }
+
+  @Get(':id/assinatura')
+  getAssinatura(@Param('id') id: string) {
+    return this.assinaturasService.getAssinaturaAtiva(id);
+  }
+
+  @Post(':id/assinatura')
+  criarAssinatura(
+    @Param('id') id: string,
+    @Body() body: { planoId: string; meses: number },
+  ) {
+    return this.assinaturasService.renovar(id, body.planoId, body.meses);
   }
 }

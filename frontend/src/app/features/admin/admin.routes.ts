@@ -6,7 +6,11 @@ export const adminRoutes: Routes = [
     path: '',
     component: AdminLayoutComponent,
     children: [
-      { path: '', redirectTo: 'empresas', pathMatch: 'full' },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+      },
       {
         path: 'empresas',
         loadComponent: () => import('./empresas/empresa-list.component').then(m => m.EmpresaListComponent),

@@ -3,10 +3,12 @@ import {
   ConflictException,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../../prisma/prisma.service';
 import { TenantService } from '../tenant/tenant.service';
+import { AssinaturasService } from '../assinaturas/assinaturas.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 
@@ -15,6 +17,7 @@ export class UsuariosService {
   constructor(
     private prisma: PrismaService,
     private tenant: TenantService,
+    private assinaturasService: AssinaturasService,
   ) {}
 
   async findAll() {
@@ -53,6 +56,17 @@ export class UsuariosService {
   }
 
   async create(dto: CreateUsuarioDto) {
+    // Check user limit
+    const assinatura = await this.assinaturasService.getAssinaturaAtiva(this.tenant.empresaId);
+    if (assinatura?.plano.maxUsuarios) {
+      const count = await this.prisma.usuario.count({
+        where: { empresaId: this.tenant.empresaId, ativo: true },
+      });
+      if (count >= assinatura.plano.maxUsuarios) {
+        throw new ForbiddenException('Limite de usuarios do plano atingido');
+      }
+    }
+
     const existe = await this.prisma.usuario.findFirst({
       where: { email: dto.email, empresaId: this.tenant.empresaId },
     });

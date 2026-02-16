@@ -3,16 +3,18 @@ import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DatePipe, CurrencyPipe } from '@angular/common';
 import { TenantService } from '../../../core/services/tenant.service';
 import { EmpresasAdminService, EmpresaDetail, EmpresaStats } from './empresas.service';
+import { AssinaturaDialogComponent } from './assinatura-dialog.component';
 
 @Component({
   selector: 'app-empresa-detail',
   standalone: true,
   imports: [
     RouterLink, MatButtonModule, MatIconModule,
-    MatProgressSpinnerModule, DatePipe, CurrencyPipe,
+    MatProgressSpinnerModule, MatDialogModule, DatePipe, CurrencyPipe,
   ],
   templateUrl: './empresa-detail.component.html',
 })
@@ -20,6 +22,7 @@ export class EmpresaDetailComponent implements OnInit {
   private readonly empresasService = inject(EmpresasAdminService);
   private readonly tenantService = inject(TenantService);
   private readonly route = inject(ActivatedRoute);
+  private readonly dialog = inject(MatDialog);
   readonly router = inject(Router);
 
   loading = signal(true);
@@ -56,5 +59,19 @@ export class EmpresaDetailComponent implements OnInit {
     if (!e) return;
     this.tenantService.setEmpresa({ id: e.id, slug: e.slug, nome: e.nome, logoUrl: e.logoUrl || undefined });
     this.router.navigate([`/${e.slug}/dashboard`]);
+  }
+
+  openAssinaturaDialog(): void {
+    const e = this.empresa();
+    if (!e) return;
+    const ref = this.dialog.open(AssinaturaDialogComponent, {
+      data: {
+        empresaId: e.id,
+        assinaturaAtual: e.assinaturas?.[0] || null,
+      },
+    });
+    ref.afterClosed().subscribe((result) => {
+      if (result) this.loadData(e.id);
+    });
   }
 }

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
@@ -21,6 +22,8 @@ import { RelatoriosModule } from './modules/relatorios/relatorios.module';
 import { HealthModule } from './health/health.module';
 import { TenantModule } from './modules/tenant/tenant.module';
 import { EmpresasModule } from './modules/empresas/empresas.module';
+import { PlanosModule } from './modules/planos/planos.module';
+import { AssinaturasModule } from './modules/assinaturas/assinaturas.module';
 
 @Module({
   imports: [
@@ -51,9 +54,12 @@ import { EmpresasModule } from './modules/empresas/empresas.module';
         },
       }),
     }),
+    ScheduleModule.forRoot(),
     PrismaModule,
     TenantModule,
     EmpresasModule,
+    PlanosModule,
+    AssinaturasModule,
     AuthModule,
     UsuariosModule,
     ClientesModule,

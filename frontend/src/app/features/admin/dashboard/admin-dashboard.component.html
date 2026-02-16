@@ -1,0 +1,145 @@
+<div class="list-header">
+  <h1>Dashboard</h1>
+</div>
+
+@if (loading()) {
+  <div class="loading">
+    <mat-spinner diameter="40" />
+  </div>
+} @else if (stats()) {
+  <!-- Metric Cards -->
+  <div class="stats-grid mb-4">
+    <div class="stat-card">
+      <div class="stat-value color-success">{{ stats()!.ativas }}</div>
+      <div class="stat-label">Empresas Ativas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value color-info">{{ stats()!.trial }}</div>
+      <div class="stat-label">Em Trial</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value color-danger">{{ stats()!.vencidas }}</div>
+      <div class="stat-label">Vencidas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value color-primary">R$ {{ stats()!.mrr | number:'1.2-2' }}</div>
+      <div class="stat-label">MRR</div>
+    </div>
+  </div>
+
+  <!-- Vencimentos Proximos -->
+  <div class="section-header mt-3">
+    <h3><mat-icon>warning</mat-icon> Vencimentos Proximos (7 dias)</h3>
+  </div>
+
+  @if (stats()!.vencimentosProximos.length === 0) {
+    <div class="empty-message">
+      <mat-icon>check_circle</mat-icon>
+      <h3>Nenhum vencimento</h3>
+      <p>Nao ha vencimentos nos proximos 7 dias</p>
+    </div>
+  } @else {
+    <!-- Desktop: Table view -->
+    <div class="table-container hide-mobile mb-4">
+      <table mat-table [dataSource]="stats()!.vencimentosProximos">
+        <ng-container matColumnDef="empresa">
+          <th mat-header-cell *matHeaderCellDef>Empresa</th>
+          <td mat-cell *matCellDef="let row">
+            <a [routerLink]="['/admin/empresas', row.empresa.id]">{{ row.empresa.nome }}</a>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="plano">
+          <th mat-header-cell *matHeaderCellDef>Plano</th>
+          <td mat-cell *matCellDef="let row">{{ row.plano.nome }}</td>
+        </ng-container>
+        <ng-container matColumnDef="dataFim">
+          <th mat-header-cell *matHeaderCellDef>Vence em</th>
+          <td mat-cell *matCellDef="let row">{{ row.dataFim | date:'dd/MM/yyyy' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="acoes">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let row">
+            <a mat-button color="primary" [routerLink]="['/admin/empresas', row.empresa.id]">
+              Gerenciar
+            </a>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="vencimentoColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: vencimentoColumns;" class="clickable-row" (click)="router.navigate(['/admin/empresas', row.empresa.id])"></tr>
+      </table>
+    </div>
+
+    <!-- Mobile: Compact list -->
+    <div class="compact-list mb-4">
+      @for (row of stats()!.vencimentosProximos; track row.id) {
+        <div class="compact-card" (click)="router.navigate(['/admin/empresas', row.empresa.id])">
+          <div class="compact-main">
+            <div class="compact-info">
+              <span class="compact-title">{{ row.empresa.nome }}</span>
+              <span class="compact-subtitle">{{ row.plano.nome }} - vence {{ row.dataFim | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="compact-meta">
+              <mat-icon class="compact-chevron">chevron_right</mat-icon>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Ultimos Cadastros -->
+  <div class="section-header mt-3">
+    <h3><mat-icon>group_add</mat-icon> Ultimos Cadastros (7 dias)</h3>
+  </div>
+
+  @if (stats()!.ultimosCadastros.length === 0) {
+    <div class="empty-message">
+      <mat-icon>business</mat-icon>
+      <h3>Nenhum cadastro recente</h3>
+      <p>Nao houve novos cadastros nos ultimos 7 dias</p>
+    </div>
+  } @else {
+    <!-- Desktop: Table view -->
+    <div class="table-container hide-mobile">
+      <table mat-table [dataSource]="stats()!.ultimosCadastros">
+        <ng-container matColumnDef="empresa">
+          <th mat-header-cell *matHeaderCellDef>Empresa</th>
+          <td mat-cell *matCellDef="let row">
+            <a [routerLink]="['/admin/empresas', row.id]">{{ row.nome }}</a>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="slug">
+          <th mat-header-cell *matHeaderCellDef>Slug</th>
+          <td mat-cell *matCellDef="let row">{{ row.slug }}</td>
+        </ng-container>
+        <ng-container matColumnDef="usuarios">
+          <th mat-header-cell *matHeaderCellDef>Usuarios</th>
+          <td mat-cell *matCellDef="let row">{{ row._count.usuarios }}</td>
+        </ng-container>
+        <ng-container matColumnDef="criadoEm">
+          <th mat-header-cell *matHeaderCellDef>Criado em</th>
+          <td mat-cell *matCellDef="let row">{{ row.criadoEm | date:'dd/MM/yyyy HH:mm' }}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="cadastroColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: cadastroColumns;" class="clickable-row" (click)="router.navigate(['/admin/empresas', row.id])"></tr>
+      </table>
+    </div>
+
+    <!-- Mobile: Compact list -->
+    <div class="compact-list">
+      @for (row of stats()!.ultimosCadastros; track row.id) {
+        <div class="compact-card" (click)="router.navigate(['/admin/empresas', row.id])">
+          <div class="compact-main">
+            <div class="compact-info">
+              <span class="compact-title">{{ row.nome }}</span>
+              <span class="compact-subtitle">{{ row.slug }} - {{ row.criadoEm | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="compact-meta">
+              <mat-icon class="compact-chevron">chevron_right</mat-icon>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+}

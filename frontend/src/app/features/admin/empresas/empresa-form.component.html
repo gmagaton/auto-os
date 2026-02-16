@@ -35,15 +35,24 @@
         <input matInput [(ngModel)]="form.endereco" name="endereco">
       </mat-form-field>
 
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Plano</mat-label>
-        <input matInput [(ngModel)]="form.plano" name="plano">
-      </mat-form-field>
+      @if (!isEditing() && planos().length) {
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Plano inicial (opcional)</mat-label>
+          <mat-select [(ngModel)]="selectedPlanoId" name="planoId">
+            <mat-option value="">Nenhum</mat-option>
+            @for (p of planos(); track p.id) {
+              <mat-option [value]="p.id">{{ p.nome }} — {{ p.preco | currency:'BRL':'symbol':'1.0-0' }}/mes</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Data de Vencimento</mat-label>
-        <input matInput [(ngModel)]="form.dataVencimento" name="dataVencimento" type="date">
-      </mat-form-field>
+        @if (selectedPlanoId && selectedPlanoId !== 'plano-trial') {
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Meses</mat-label>
+            <input matInput type="number" [(ngModel)]="meses" name="meses" min="1">
+          </mat-form-field>
+        }
+      }
 
       <div class="form-actions">
         <button mat-stroked-button type="button" routerLink="/admin/empresas">Cancelar</button>

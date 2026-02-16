@@ -66,11 +66,24 @@
         </div>
         <div class="info-row">
           <span class="label">Plano</span>
-          <span class="value">{{ e.plano || '-' }}</span>
+          <span class="value">{{ e.assinaturas[0]?.plano?.nome || '-' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Assinatura</span>
+          <span class="value">{{ e.assinaturas[0]?.status || '-' }}</span>
         </div>
         <div class="info-row">
           <span class="label">Vencimento</span>
-          <span class="value">{{ e.dataVencimento ? (e.dataVencimento | date:'dd/MM/yyyy') : '-' }}</span>
+          <span class="value">{{ e.assinaturas[0]?.dataFim ? (e.assinaturas[0].dataFim | date:'dd/MM/yyyy') : '-' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Acao</span>
+          <span class="value">
+            <button mat-stroked-button color="primary" (click)="openAssinaturaDialog()">
+              <mat-icon>{{ e.assinaturas[0] ? 'sync' : 'add_card' }}</mat-icon>
+              {{ e.assinaturas[0] ? 'Renovar / Trocar' : 'Atribuir Plano' }}
+            </button>
+          </span>
         </div>
         <div class="info-row">
           <span class="label">Criada em</span>

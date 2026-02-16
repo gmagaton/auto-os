@@ -84,4 +84,21 @@ export class EmailService {
       console.error('Erro ao enviar email de finalizacao:', error);
     }
   }
+
+  async enviarResetSenha(email: string, nome: string, link: string, empresaNome: string): Promise<void> {
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        subject: `Redefinir Senha - ${empresaNome || 'AutoOS'}`,
+        template: 'reset-senha',
+        context: {
+          nome,
+          link,
+          empresaNome,
+        },
+      });
+    } catch (error) {
+      console.error('Erro ao enviar email de reset de senha:', error);
+    }
+  }
 }

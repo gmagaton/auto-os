@@ -1,0 +1,67 @@
+<div class="login-container">
+  <mat-card class="login-card">
+    <div class="login-logo">
+      <img src="assets/branding/logo-horizontal.png" alt="AutoOS" class="logo-img" />
+    </div>
+    <h2 style="text-align: center; margin-bottom: 16px;">Criar conta gratuita</h2>
+    <mat-card-content>
+      <form (ngSubmit)="cadastrar()" class="login-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nome da Empresa</mat-label>
+          <input matInput [(ngModel)]="nomeEmpresa" name="nomeEmpresa" required
+                 (ngModelChange)="onNomeEmpresaChange()" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Slug (URL)</mat-label>
+          <input matInput [(ngModel)]="slug" name="slug" required
+                 (ngModelChange)="onSlugChange()" />
+          @if (verificandoSlug) {
+            <mat-hint>Verificando disponibilidade...</mat-hint>
+          } @else if (slugDisponivel === true) {
+            <mat-hint style="color: green;">Slug disponivel</mat-hint>
+          } @else if (slugDisponivel === false) {
+            <mat-hint style="color: red;">Slug ja em uso</mat-hint>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Seu Nome</mat-label>
+          <input matInput [(ngModel)]="nomeAdmin" name="nomeAdmin" required />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" [(ngModel)]="email" name="email" required />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Senha</mat-label>
+          <input matInput type="password" [(ngModel)]="senha" name="senha" required minlength="6" />
+        </mat-form-field>
+
+        @if (error) {
+          <div class="login-error">{{ error }}</div>
+        }
+
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          class="full-width login-btn"
+          [disabled]="loading || slugDisponivel === false"
+        >
+          @if (loading) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            Criar conta
+          }
+        </button>
+
+        <p style="text-align: center; margin-top: 16px;">
+          Ja tem uma conta? <a routerLink="/login">Entrar</a>
+        </p>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

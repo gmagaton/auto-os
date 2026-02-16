@@ -48,8 +48,14 @@
       </ng-container>
 
       <ng-container matColumnDef="vencimento">
-        <th mat-header-cell *matHeaderCellDef>Vencimento</th>
-        <td mat-cell *matCellDef="let e">{{ e.dataVencimento | date:'dd/MM/yyyy' }}</td>
+        <th mat-header-cell *matHeaderCellDef>Plano / Vencimento</th>
+        <td mat-cell *matCellDef="let e">
+          @if (e.assinaturas && e.assinaturas[0]) {
+            {{ e.assinaturas[0].plano.nome }} - {{ e.assinaturas[0].dataFim | date:'dd/MM/yyyy' }}
+          } @else {
+            -
+          }
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="acoes">

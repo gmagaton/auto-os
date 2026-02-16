@@ -18,6 +18,16 @@ export const routes: Routes = [
       import('./features/login/login.component').then((m) => m.LoginComponent),
   },
   {
+    path: 'cadastro',
+    loadComponent: () =>
+      import('./features/cadastro/cadastro.component').then((m) => m.CadastroComponent),
+  },
+  {
+    path: 'esqueci-senha',
+    loadComponent: () =>
+      import('./features/auth/esqueci-senha.component').then((m) => m.EsqueciSenhaComponent),
+  },
+  {
     path: 'portal',
     loadChildren: () => import('./features/portal/portal.routes').then(m => m.portalRoutes),
   },
@@ -30,6 +40,11 @@ export const routes: Routes = [
     path: ':slug/login',
     loadComponent: () =>
       import('./features/login/login.component').then((m) => m.LoginComponent),
+  },
+  {
+    path: ':slug/redefinir-senha/:token',
+    loadComponent: () =>
+      import('./features/auth/redefinir-senha.component').then((m) => m.RedefinirSenhaComponent),
   },
   {
     path: ':slug',
@@ -75,6 +90,11 @@ export const routes: Routes = [
       {
         path: 'agenda',
         loadChildren: () => import('./features/agenda/agenda.routes').then(m => m.agendaRoutes),
+      },
+      {
+        path: 'assinatura',
+        loadChildren: () => import('./features/assinatura/assinatura.routes').then(m => m.assinaturaRoutes),
+        canActivate: [adminGuard],
       },
     ],
   },

@@ -41,10 +41,6 @@ export class TenantGuard implements CanActivate {
       throw new ForbiddenException('Empresa inativa ou suspensa');
     }
 
-    if (empresa.dataVencimento && new Date(empresa.dataVencimento) < new Date()) {
-      throw new ForbiddenException('Plano vencido');
-    }
-
     return true;
   }
 }

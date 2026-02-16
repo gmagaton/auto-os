@@ -1,6 +1,9 @@
-import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { RegistroDto } from './dto/registro.dto';
+import { EsqueciSenhaDto } from './dto/esqueci-senha.dto';
+import { RedefinirSenhaDto } from './dto/redefinir-senha.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 
@@ -11,6 +14,26 @@ export class AuthController {
   @Post('login')
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
+  }
+
+  @Post('registro')
+  registro(@Body() dto: RegistroDto) {
+    return this.authService.registro(dto);
+  }
+
+  @Get('verificar-slug/:slug')
+  verificarSlug(@Param('slug') slug: string) {
+    return this.authService.verificarSlug(slug);
+  }
+
+  @Post('esqueci-senha')
+  esqueciSenha(@Body() dto: EsqueciSenhaDto) {
+    return this.authService.esqueciSenha(dto.email);
+  }
+
+  @Post('redefinir-senha')
+  redefinirSenha(@Body() dto: RedefinirSenhaDto) {
+    return this.authService.redefinirSenha(dto.token, dto.novaSenha);
   }
 
   @UseGuards(JwtAuthGuard)

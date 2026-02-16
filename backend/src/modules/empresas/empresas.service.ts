@@ -22,14 +22,22 @@ export class EmpresasService {
         nome: true,
         slug: true,
         status: true,
-        plano: true,
-        dataVencimento: true,
         criadoEm: true,
         _count: {
           select: {
             usuarios: true,
             clientes: true,
             ordens: true,
+          },
+        },
+        assinaturas: {
+          where: { status: { in: ['TRIAL', 'ATIVA'] } },
+          orderBy: { criadoEm: 'desc' },
+          take: 1,
+          select: {
+            status: true,
+            dataFim: true,
+            plano: { select: { nome: true } },
           },
         },
       },
@@ -49,8 +57,6 @@ export class EmpresasService {
         email: true,
         endereco: true,
         status: true,
-        plano: true,
-        dataVencimento: true,
         criadoEm: true,
         atualizadoEm: true,
         _count: {
@@ -60,6 +66,18 @@ export class EmpresasService {
             veiculos: true,
             ordens: true,
             servicos: true,
+          },
+        },
+        assinaturas: {
+          where: { status: { in: ['TRIAL', 'ATIVA'] } },
+          orderBy: { criadoEm: 'desc' },
+          take: 1,
+          select: {
+            id: true,
+            status: true,
+            dataInicio: true,
+            dataFim: true,
+            plano: { select: { id: true, nome: true, slug: true, maxUsuarios: true, preco: true } },
           },
         },
       },
@@ -107,8 +125,6 @@ export class EmpresasService {
         telefone: dto.telefone,
         email: dto.email,
         endereco: dto.endereco,
-        plano: dto.plano,
-        dataVencimento: dto.dataVencimento ? new Date(dto.dataVencimento) : null,
         logoUrl: dto.logoUrl,
       },
     });
@@ -128,10 +144,7 @@ export class EmpresasService {
 
     return this.prisma.empresa.update({
       where: { id },
-      data: {
-        ...dto,
-        dataVencimento: dto.dataVencimento ? new Date(dto.dataVencimento) : undefined,
-      },
+      data: dto,
     });
   }
 
@@ -162,6 +175,69 @@ export class EmpresasService {
     }
 
     return this.prisma.empresa.delete({ where: { id } });
+  }
+
+  async getDashboardStats() {
+    const now = new Date();
+    const seteDiasAtras = new Date();
+    seteDiasAtras.setDate(seteDiasAtras.getDate() - 7);
+    const seteDiasFrente = new Date();
+    seteDiasFrente.setDate(seteDiasFrente.getDate() + 7);
+
+    const [ativas, trial, vencidas, mrrResult, vencimentosProximos, ultimosCadastros] = await Promise.all([
+      // Count active subscriptions
+      this.prisma.assinatura.count({
+        where: { status: 'ATIVA' },
+      }),
+      // Count trial subscriptions still valid
+      this.prisma.assinatura.count({
+        where: { status: 'TRIAL', dataFim: { gt: now } },
+      }),
+      // Count expired subscriptions
+      this.prisma.assinatura.count({
+        where: { status: 'VENCIDA' },
+      }),
+      // MRR: sum of prices for active subscriptions
+      this.prisma.assinatura.findMany({
+        where: { status: 'ATIVA' },
+        include: { plano: { select: { preco: true } } },
+      }),
+      // Subscriptions expiring in next 7 days
+      this.prisma.assinatura.findMany({
+        where: {
+          status: { in: ['TRIAL', 'ATIVA'] },
+          dataFim: { gte: now, lte: seteDiasFrente },
+        },
+        include: {
+          empresa: { select: { id: true, nome: true, slug: true } },
+          plano: { select: { nome: true } },
+        },
+        orderBy: { dataFim: 'asc' },
+      }),
+      // Companies created in last 7 days
+      this.prisma.empresa.findMany({
+        where: { criadoEm: { gte: seteDiasAtras } },
+        select: {
+          id: true,
+          nome: true,
+          slug: true,
+          criadoEm: true,
+          _count: { select: { usuarios: true } },
+        },
+        orderBy: { criadoEm: 'desc' },
+      }),
+    ]);
+
+    const mrr = mrrResult.reduce((sum, a) => sum + Number(a.plano.preco), 0);
+
+    return {
+      ativas,
+      trial,
+      vencidas,
+      mrr,
+      vencimentosProximos,
+      ultimosCadastros,
+    };
   }
 
   private generateSlug(nome: string): string {

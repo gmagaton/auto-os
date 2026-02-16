@@ -186,6 +186,48 @@ async function main() {
   });
   console.log('Usuario admin criado (admin@oficina.com / admin123)');
 
+  // Criar planos
+  const planos = [
+    { id: 'plano-trial', nome: 'Trial', slug: 'trial', maxUsuarios: null, preco: 0 },
+    { id: 'plano-basico', nome: 'Basico', slug: 'basico', maxUsuarios: 2, preco: 99.90 },
+    { id: 'plano-profissional', nome: 'Profissional', slug: 'profissional', maxUsuarios: 5, preco: 199.90 },
+    { id: 'plano-enterprise', nome: 'Enterprise', slug: 'enterprise', maxUsuarios: null, preco: 499.90 },
+  ];
+
+  for (const plano of planos) {
+    await prisma.plano.upsert({
+      where: { id: plano.id },
+      update: { nome: plano.nome, preco: plano.preco, maxUsuarios: plano.maxUsuarios },
+      create: {
+        id: plano.id,
+        nome: plano.nome,
+        slug: plano.slug,
+        maxUsuarios: plano.maxUsuarios,
+        preco: plano.preco,
+      },
+    });
+  }
+  console.log(`${planos.length} planos criados`);
+
+  // Criar assinatura trial para empresa padrao
+  const trialDataFim = new Date();
+  trialDataFim.setDate(trialDataFim.getDate() + 14);
+
+  const existingAssinatura = await prisma.assinatura.findFirst({
+    where: { empresaId: defaultEmpresaId },
+  });
+  if (!existingAssinatura) {
+    await prisma.assinatura.create({
+      data: {
+        empresaId: defaultEmpresaId,
+        planoId: 'plano-trial',
+        status: 'TRIAL',
+        dataFim: trialDataFim,
+      },
+    });
+    console.log('Assinatura trial criada para empresa padrao');
+  }
+
   // Criar serviços
   const servicos = [
     // Funilaria

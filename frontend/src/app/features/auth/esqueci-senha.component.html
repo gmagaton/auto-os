@@ -1,0 +1,47 @@
+<div class="login-container">
+  <mat-card class="login-card">
+    <div class="login-logo">
+      <img src="assets/branding/logo-horizontal.png" alt="AutoOS" class="logo-img" />
+    </div>
+    <h2 style="text-align: center; margin-bottom: 16px;">Esqueci minha senha</h2>
+    <mat-card-content>
+      @if (enviado) {
+        <p style="text-align: center; margin-bottom: 16px;">
+          Se o email informado estiver cadastrado, enviaremos instrucoes para redefinir sua senha.
+        </p>
+        <p style="text-align: center;">
+          <a routerLink="/login">Voltar ao login</a>
+        </p>
+      } @else {
+        <form (ngSubmit)="enviar()" class="login-form">
+          <p style="margin-bottom: 16px;">
+            Informe seu email e enviaremos um link para redefinir sua senha.
+          </p>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" [(ngModel)]="email" name="email" required />
+          </mat-form-field>
+
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            class="full-width login-btn"
+            [disabled]="loading"
+          >
+            @if (loading) {
+              <mat-spinner diameter="20"></mat-spinner>
+            } @else {
+              Enviar
+            }
+          </button>
+
+          <p style="text-align: center; margin-top: 16px;">
+            <a routerLink="/login">Voltar ao login</a>
+          </p>
+        </form>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

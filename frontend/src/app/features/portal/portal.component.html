@@ -65,8 +65,10 @@
             @if (aprovando()) {
               <mat-spinner diameter="20"></mat-spinner>
             } @else {
-              <mat-icon>check_circle</mat-icon>
-              Aprovar Orcamento
+              <ng-container>
+                <mat-icon>check_circle</mat-icon>
+                Aprovar Orcamento
+              </ng-container>
             }
           </button>
         </div>

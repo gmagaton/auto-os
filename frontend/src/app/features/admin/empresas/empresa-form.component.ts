@@ -4,17 +4,19 @@ import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { EmpresasAdminService } from './empresas.service';
+import { CurrencyPipe } from '@angular/common';
+import { EmpresasAdminService, Plano } from './empresas.service';
 
 @Component({
   selector: 'app-empresa-form',
   standalone: true,
   imports: [
     FormsModule, RouterLink, MatCardModule, MatFormFieldModule, MatInputModule,
-    MatButtonModule, MatIconModule, MatProgressSpinnerModule,
+    MatSelectModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule, CurrencyPipe,
   ],
   templateUrl: './empresa-form.component.html',
 })
@@ -25,8 +27,11 @@ export class EmpresaFormComponent implements OnInit {
 
   isEditing = signal(false);
   loading = signal(false);
+  planos = signal<Plano[]>([]);
   empresaId = '';
   error = '';
+  selectedPlanoId = '';
+  meses = 1;
 
   form = {
     nome: '',
@@ -34,8 +39,6 @@ export class EmpresaFormComponent implements OnInit {
     email: '',
     telefone: '',
     endereco: '',
-    plano: '',
-    dataVencimento: '',
   };
 
   ngOnInit(): void {
@@ -51,19 +54,25 @@ export class EmpresaFormComponent implements OnInit {
             email: e.email || '',
             telefone: e.telefone || '',
             endereco: e.endereco || '',
-            plano: e.plano || '',
-            dataVencimento: e.dataVencimento ? e.dataVencimento.split('T')[0] : '',
           };
         },
+      });
+    } else {
+      this.empresasService.getPlanos().subscribe({
+        next: (planos) => this.planos.set(planos),
       });
     }
   }
 
   save(): void {
     this.loading.set(true);
-    const dto = { ...this.form };
-    if (!dto.slug) delete (dto as any).slug;
-    if (!dto.dataVencimento) delete (dto as any).dataVencimento;
+    const dto: any = { ...this.form };
+    if (!dto.slug) delete dto.slug;
+
+    if (!this.isEditing() && this.selectedPlanoId) {
+      dto.planoId = this.selectedPlanoId;
+      dto.meses = this.meses;
+    }
 
     const obs = this.isEditing()
       ? this.empresasService.update(this.empresaId, dto)

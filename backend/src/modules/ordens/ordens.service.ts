@@ -2,10 +2,12 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../prisma/prisma.service';
 import { TenantService } from '../tenant/tenant.service';
+import { AssinaturasService } from '../assinaturas/assinaturas.service';
 import { StatusOS } from '../../../generated/prisma/enums';
 import { EmailService, OrdemEmailData } from '../email/email.service';
 import { CreateOrdemDto } from './dto/create-ordem.dto';
@@ -22,6 +24,7 @@ export class OrdensService {
     private emailService: EmailService,
     private configService: ConfigService,
     private tenant: TenantService,
+    private assinaturasService: AssinaturasService,
   ) {
     this.frontendUrl = this.configService.get('FRONTEND_URL', 'http://localhost:4200');
   }
@@ -386,6 +389,18 @@ export class OrdensService {
   }
 
   async create(dto: CreateOrdemDto, usuarioId: string) {
+    // Check subscription
+    const assinatura = await this.assinaturasService.getAssinaturaAtiva(this.tenant.empresaId);
+    if (!assinatura) {
+      throw new ForbiddenException('Assinatura vencida ou inexistente');
+    }
+    if (assinatura.status === 'VENCIDA') {
+      throw new ForbiddenException('Assinatura vencida');
+    }
+    if (assinatura.status === 'TRIAL' && new Date(assinatura.dataFim) < new Date()) {
+      throw new ForbiddenException('Periodo de teste expirado');
+    }
+
     // Calculate total value
     const valorTotal = dto.itens.reduce(
       (sum, item) => sum + item.valor,

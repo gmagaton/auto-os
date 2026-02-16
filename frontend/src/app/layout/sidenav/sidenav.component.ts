@@ -28,6 +28,7 @@ export class SidenavComponent {
       { label: 'Fabricantes', icon: 'factory', route: `/${slug}/fabricantes` },
       { label: 'Checklist', icon: 'checklist', route: `/${slug}/checklist`, adminOnly: true },
       { label: 'Usuarios', icon: 'admin_panel_settings', route: `/${slug}/usuarios`, adminOnly: true },
+      { label: 'Assinatura', icon: 'card_membership', route: `/${slug}/assinatura`, adminOnly: true },
     ];
   });
 
